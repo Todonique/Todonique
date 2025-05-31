@@ -1,3 +1,6 @@
+import { IPinfo } from "node-ipinfo";
+import { config } from "../config";
+
 export function extractBearerToken(authorizationHeader?: string): string | undefined {
     if(!authorizationHeader){ 
         return undefined;
@@ -9,4 +12,8 @@ export function extractBearerToken(authorizationHeader?: string): string | undef
             return parts[1];
         }
     }
+}
+
+export const isBlockedLocation = (ipinfo: IPinfo) => {
+    return config.allowedCities.includes(ipinfo.city);
 }

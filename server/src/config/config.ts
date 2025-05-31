@@ -15,7 +15,9 @@ export type Config = {
   allowedOrigins: string[];
   maxBytesRequestSize: number;
   allowedHTMLTags: string[];
-  allowedHTMLAttributes: Record<string, sanitize.AllowedAttribute[]>
+  allowedHTMLAttributes: Record<string, sanitize.AllowedAttribute[]>;
+  ipinfoToken: string;
+  allowedCities: string[];
 }
 
 const parseIfSetElseDefault = <T>(envVariable: string | undefined, defaultValue: T): T => {
@@ -35,7 +37,7 @@ const parseIfSetElseDefault = <T>(envVariable: string | undefined, defaultValue:
   }
 }
 
-const config: Config = {
+export const config: Config = {
   port: Number(parseIfSetElseDefault('PORT', '3000')) || 3000,
   nodeEnv: parseIfSetElseDefault('NODE_ENV', 'development'),
   baseURL: parseIfSetElseDefault('BASE_URL', 'http://localhost:3000'),
@@ -48,8 +50,6 @@ const config: Config = {
   maxBytesRequestSize: parseIfSetElseDefault('MAX_REQUEST_SIZE', 10485760),
   allowedHTMLTags: parseIfSetElseDefault('ALLOWED_HTML_TAGS', sanitize.defaults.allowedTags),
   allowedHTMLAttributes: parseIfSetElseDefault('ALLOWED_HTML_ATTRIBUTES', sanitize.defaults.allowedAttributes),
+  ipinfoToken: parseIfSetElseDefault('IPINFO_TOKEN', ''),
+  allowedCities: parseIfSetElseDefault('ALLOWED_CITIES', []),
 };
-
-
-
-export default config;

@@ -1,7 +1,7 @@
 import pg from 'pg';
-import config from '.';
+import { config } from './config';
 
-const pool = new pg.Pool({
+export const pool = new pg.Pool({
     host: config.dbHost,
     database: config.dbName,
     user: config.dbUser,
@@ -10,5 +10,3 @@ const pool = new pg.Pool({
         rejectUnauthorized: false 
     }
 });
-
-export default pool;

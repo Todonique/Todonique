@@ -4,7 +4,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import sanitize from 'sanitize-html';
 import { config } from '../config';
-import { extractBearerToken } from '../utils';
+import { extractBearerToken, isBlockedLocation } from '../utils';
+import IPinfoWrapper from 'node-ipinfo';
 
 export const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -77,17 +78,24 @@ export const authorize = (requiredRole: string) => {
 };
 
 // Location-based security middleware (example)
-export const locationCheck = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const clientIP = req.ip;
-        // Implement your IP geolocation logic here
-        // const location = await getLocationFromIP(clientIP);
-        // if (isBlockedLocation(location)) {
-        //     return res.status(403).json({ error: 'Access denied from your location' });
-        // }
-        next();
-    } catch (error) {
-        res.status(403).json({ error: 'Access denied from your location' });
-    }
+export const locationCheck = (ipinfoWrapper: IPinfoWrapper) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const clientIP = req.ip;
+            if (!clientIP) {
+                res.status(403).json({ error: 'Access denied from your location' });
+            } else {
+                const ipinfo = await ipinfoWrapper.lookupIp(clientIP);
+                if (isBlockedLocation(ipinfo)) {
+                    res.status(403).json({ error: 'Access denied from your location' });
+                } else {
+                    // TODO: use ipinfo for other stuff as well
+                    next();
+                }
+            }
+        } catch (error) {
+            res.status(403).json({ error: 'Access denied from your location' });
+        }
+    };
 };
 
