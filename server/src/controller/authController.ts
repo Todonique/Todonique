@@ -2,28 +2,33 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
+import { config } from '../config';
+import { Request, Response } from 'express';
+import { CreateUser } from '../models/user';
 
-export const registerHandler = async (req, res) => {
-    const { email, password } = req.body;
-    
+export const registerHandler = async (req: Request, res: Response) => {
     try {
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+        const { username, password }: CreateUser = req.body;
+        if (!username || !password) {
+            res.status(400).json({ error: 'username and password are required' });
+        } else{
+            // find if user already exists
+            const existingUser = null // await find user
+            if (existingUser) {
+                res.status(400).json({ error: 'User already exists' });
+            } else{
+                // create user
+                const newUser = null // await create user
+                res.json({ message: 'User registered successfully' });
+            }
         }
 
-        // find if user already exists
-        const existingUser = null // await find user
-        if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
-        };
-
-        res.json({ message: 'User registered successfully' });
     } catch (error) {
-       
+       res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-export const setupTwoFactorAuthenticationHandler = async (req, res) => {
+export const setupTwoFactorAuthenticationHandler = async (req: Request, res: Response) => {
     const { email } = req.body;
     const user = {
             email: 'chris@gmail.com',
@@ -45,13 +50,13 @@ export const setupTwoFactorAuthenticationHandler = async (req, res) => {
     // await saveUserTwoFactorSecret(user.id, secret.base32);
     console.log('Generated 2FA Secret:', secret.base32);
 
-    qrcode.toDataURL(secret.otpauth_url, (err, dataUrl) => {
+    qrcode.toDataURL(secret.otpauth_url || '', (err, dataUrl) => {
         if (err) return res.status(500).json({ error: 'QR generation error' });
         res.json({ qrCode: dataUrl });
     });
 };
 
-export const verifyTwoFactorHandler = async (req, res) => {
+export const verifyTwoFactorHandler = async (req: Request, res: Response) => {
     const { email, token, secret } = req.body;
  // hard coding secret for demo purposes
     const user = {
@@ -78,7 +83,7 @@ export const verifyTwoFactorHandler = async (req, res) => {
     res.json({ message: '2FA verified successfully' });
 };
 
-export const loginHandler = async (req, res) => {
+export const loginHandler = async (req: Request, res: Response) => {
     const { email, password, token } = req.body;
 
     try {
@@ -116,8 +121,8 @@ export const loginHandler = async (req, res) => {
         };
 
         const jwtToken = jwt.sign(
-            { userId: user.id, email: user.email },
-            process.env.JWT_SECRET,
+            { email: user.email },
+            config.jwtSecret,
             { expiresIn: '1h' }
         );
 
