@@ -14,11 +14,13 @@
   "description": "",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.29",
     "@types/pg": "^8.15.2",
     "@types/qrcode": "^1.5.5",
+    "@types/sanitize-html": "^2.16.0",
     "@types/speakeasy": "^2.0.10",
     "dotenv": "^16.5.0",
     "eslint": "^9.28.0",
@@ -32,9 +34,15 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "csrf": "^3.1.0",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.0",
     "qrcode": "^1.5.4",
+    "sanitize-html": "^2.17.0",
     "speakeasy": "^2.0.0"
   }
 }
