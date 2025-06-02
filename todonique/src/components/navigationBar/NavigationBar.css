@@ -1,0 +1,30 @@
+/* NavigationBar.css */
+
+.navbar {
+  background-color: #0056b3;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar__list {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__item {
+  display: inline;
+}
+
+.navbar__link {
+  text-decoration: none;
+  color: #eee;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar__link:hover {
+  color: #0056b3;
+}

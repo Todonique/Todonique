@@ -5,7 +5,7 @@ import AuthLayout from "./layouts/AuthLayout";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import CreateTodo from "./pages/CreateTodo";
+import CreateTodo from "./pages/createTodo/CreateTodo";
 import UpdateTodo from "./pages/UpdateTodo";
 import ReadTodos from "./pages/ReadTodos";
 import ResetPassword from "./pages/ResetPassword";
