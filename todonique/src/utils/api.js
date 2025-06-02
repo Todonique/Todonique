@@ -13,8 +13,8 @@ const defaultHeaders = {
  * @param {boolean} [options.auth=false] - optional to include authorization header
  */
 export async function apiRequest(endpoint, {
-  method = "GET",
-  body = null,
+  method,
+  body,
   auth = false
 } = {}) {
   try {
@@ -32,7 +32,9 @@ export async function apiRequest(endpoint, {
     };
 
     if (body && method !== "GET") {
+
       fetchOptions.body = JSON.stringify(body);
+      
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);

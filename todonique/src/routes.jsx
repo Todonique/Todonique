@@ -3,8 +3,8 @@ import { createBrowserRouter } from "react-router-dom";
 import Root from "./layouts/Root";
 import AuthLayout from "./layouts/AuthLayout";
 
-import Register from "./pages/Register";
-import Login from "./pages/Login";
+import Register from "./pages/Register/Register";
+import Login from "./pages/Login/Login";
 import CreateTodo from "./pages/createTodo/CreateTodo";
 import UpdateTodo from "./pages/updateTodo/UpdateTodo";
 import ReadTodos from "./pages/readTodos/ReadTodos";
@@ -12,6 +12,7 @@ import ResetPassword from "./pages/ResetPassword";
 import ApproveTeamLead from "./pages/ApproveTeamLead";
 import Invites from "./pages/invites/Invites";
 import SetupMFA from "./pages/SetupMFA";
+import Setup2FA from "./pages/setup2FA/Setup2FA";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { SendUserInvite } from "./components/sendUserInvite/SendUserInvite";
 import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
@@ -41,6 +42,11 @@ const router = createBrowserRouter([
           { path: "register", element: <Register /> },
         ],
       },
+      {path: "2fa",        element: <AuthLayout />,
+        children: [ 
+          { path: "setup", element: <Setup2FA /> }
+        ]  
+      }
     ],
   },
 ]);

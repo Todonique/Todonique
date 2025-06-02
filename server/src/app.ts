@@ -14,7 +14,7 @@ app.use(rateLimiter);
 app.use(securityHeaders);
 app.use(corsMiddleware);
 app.use(requestSizeLimiter);
-app.use(sanitizeInput);
+//app.use(sanitizeInput);
 
 app.use('/api/todos', authenticate, authorize('user'), locationCheck(ipinfoWrapper), todoRoutes);
 app.use('/api/auth', locationCheck(ipinfoWrapper), authRoutes);
