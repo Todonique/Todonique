@@ -35,49 +35,48 @@ export async function createTodo(todo: CreateTodo): Promise<ReadTodo | undefined
             inserted_todo.created_by,
             creator.username AS created_by_name,
             inserted_todo.team_id,
-            teams.team_name
+            teams.name AS team_name
         FROM inserted_todo
         JOIN todo_status ON inserted_todo.todo_status_id = todo_status.todo_status_id
-        JOIN users ON inserted_todo.assigned_to = users.user_id
+        LEFT JOIN users ON inserted_todo.assigned_to = users.user_id
         JOIN users AS creator ON inserted_todo.created_by = creator.user_id
         JOIN teams ON inserted_todo.team_id = teams.team_id
         LIMIT 1
     `,
-        [
-            todo.title,
-            todo.description,
-            todo.assigned_to,
-            todo.created_by,
-            todo.team_id
-        ]
-    );
+    [
+        todo.title,
+        todo.description,
+        todo.assigned_to,
+        todo.created_by,
+        todo.team_id
+    ]
+    );    
     return todoSelection.rows.length > 0 ? todoSelection.rows[0] : undefined;
 }
 
 export async function getTodo(todoId: number): Promise<ReadTodo | undefined> {
     const todoSelection = await pool.query<ReadTodo>(`
         SELECT
-            todo.todo_id,
-            todo.title,
-            todo.description,
+            todos.todo_id,
+            todos.title,
+            todos.description,
             todo_status.todo_status_name AS status,
-            todo.created_at,
-            todo.assigned_to,
+            todos.created_at,
+            todos.assigned_to,
             users.username AS assigned_name,
-            todo.created_by,
+            todos.created_by,
             creator.username AS created_by_name,
-            todo.team_id,
-            teams.team_name
+            todos.team_id,
+            teams.name AS team_name
         FROM todos
         JOIN todo_status ON todos.todo_status_id = todo_status.todo_status_id
-        JOIN users ON todos.assigned_to = users.user_id
+        LEFT JOIN users ON todos.assigned_to = users.user_id
         JOIN users AS creator ON todos.created_by = creator.user_id
         JOIN teams ON todos.team_id = teams.team_id
         WHERE todos.todo_id = $1
         LIMIT 1
-    `,
-        [todoId]
-    );
+    `, [todoId]);
+    
     return todoSelection.rows.length > 0 ? todoSelection.rows[0] : undefined;
 }
 
@@ -89,7 +88,7 @@ export async function updateTodo(todoId: number, todo: UpdateTodo): Promise<Read
                 title = $1,
                 description = $2,
                 todo_status_id = (SELECT todo_status_id FROM todo_status WHERE todo_status_name = $3),
-                assigned_to = $4,
+                assigned_to = $4
             WHERE todo_id = $5
             RETURNING *
         )
@@ -104,23 +103,20 @@ export async function updateTodo(todoId: number, todo: UpdateTodo): Promise<Read
             updated_todo.created_by,
             creator.username AS created_by_name,
             updated_todo.team_id,
-            teams.team_name
+            teams.name AS team_name
         FROM updated_todo
         JOIN todo_status ON updated_todo.todo_status_id = todo_status.todo_status_id
-        JOIN users ON updated_todo.assigned_to = users.user_id
+        LEFT JOIN users ON updated_todo.assigned_to = users.user_id
         JOIN users AS creator ON updated_todo.created_by = creator.user_id
         JOIN teams ON updated_todo.team_id = teams.team_id
-        WHERE updated_todo.todo_id = $5
         LIMIT 1
-    `,[
-            todo.title,
-            todo.description,
-            todo.status,
-            todo.assigned_to,
-            todoId
-        ]
-    );
+    `, [
+        todo.title,
+        todo.description,
+        todo.status,
+        todo.assigned_to,
+        todoId
+    ]);
+
     return todoSelection.rows.length > 0 ? todoSelection.rows[0] : undefined;
 }
-
-
