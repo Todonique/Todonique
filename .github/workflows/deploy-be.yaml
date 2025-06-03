@@ -2,7 +2,7 @@ name: Deploy Backend to ECS
 
 on:
   push:
-    branches: [dev, main]
+    branches: [kgothatso/feature/ci-cd, main,]
     paths:
       - 'server/**'
       - '.github/workflows/deploy-backend.yml'
