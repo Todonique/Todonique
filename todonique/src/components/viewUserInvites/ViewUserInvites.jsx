@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import "./ViewUserInvites.css";
+import { apiRequest } from "../../utils/api";
 
 export default function ViewUserInvites() {
   const [invites, setInvites] = useState([]);
@@ -25,39 +27,56 @@ export default function ViewUserInvites() {
     setInvites(mockInvites);
   }, []);
 
-  const handleRespond = (id, response) => {
+  const handleRespond = async (id, response) => {
+    // This is a placeholder for an API call to respond to an invite.
+    // In a real application, you would replace this with a call to your backend service,
+    // passing the invite ID and response (e.g., "accepted" or "declined") as parameters.
+    // Example:
+    try {
+      await apiRequest(`/invites/${id}/respond`, {
+        method: "POST",
+        body: { response },
+        // auth: true,
+      });
+      setMessage(`Invite ${id} marked as ${response}`);
+    } catch (error) {
+      setMessage(`Error responding to invite ${id}: ${error.message}`);
+      return;
+    }
     setInvites((prev) =>
       prev.map((invite) =>
         invite.id === id ? { ...invite, status: response } : invite
       )
     );
-    setMessage(`Invite ${id} marked as ${response}`);
   };
 
   return (
-    <section>
-      <h2>Team Invites</h2>
+    <section className="view-user-invites">
+      <header className="view-user-invites__header">
+        <h1 className="view-user-invites__title">Team Invites</h1>
+      </header>
+   
       {invites.length === 0 ? (
         <p>No invites available.</p>
       ) : (
-        <ul>
-          {invites.map(({ id, teamName, invitedBy, status, createdAt }) => (
-            <li key={id}>
-              <p>
-                <strong>Team:</strong> {teamName}<br />
-                <strong>Invited By:</strong> {invitedBy}<br />
-                <strong>Status:</strong> {status}<br />
-                <strong>Created:</strong> {createdAt}
-              </p>
-              {status === "pending" && (
-                <div>
-                  <button onClick={() => handleRespond(id, "accepted")}>Accept</button>
-                  <button onClick={() => handleRespond(id, "declined")}>Decline</button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+        <ul className="invite-list">
+  {invites.map(({ id, teamName, invitedBy, status, createdAt }) => (
+    <li key={id} className="invite-card">
+      <div className="invite-card__content">
+        <p><strong>Team:</strong> {teamName}</p>
+        <p><strong>Invited By:</strong> {invitedBy}</p>
+        <p><strong>Status:</strong> {status}</p>
+        <p><strong>Created:</strong> {createdAt}</p>
+      </div>
+      {status === "pending" && (
+        <div className="invite-card__actions">
+          <button onClick={() => handleRespond(id, "accepted")}>Accept</button>
+          <button onClick={() => handleRespond(id, "declined")}>Decline</button>
+        </div>
+      )}
+    </li>
+  ))}
+</ul>
       )}
       {message && <p>{message}</p>}
     </section>

@@ -1,0 +1,74 @@
+.view-user-invites {
+  padding: 2rem;
+}
+
+.view-user-invites__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.view-user-invites__title {
+  font-size: 2rem;
+  color: #000;
+}
+
+.invite-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.invite-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.invite-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.invite-card__content p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.invite-card__actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.invite-card__actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.invite-card__actions button:first-child {
+  background-color: #28a745;
+  color: white;
+}
+
+.invite-card__actions button:first-child:hover {
+  background-color: #218838;
+}
+
+.invite-card__actions button:last-child {
+  background-color: #dc3545;
+  color: white;
+}
+
+.invite-card__actions button:last-child:hover {
+  background-color: #c82333;
+}
