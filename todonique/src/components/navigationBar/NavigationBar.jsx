@@ -1,14 +1,21 @@
-// NavigationBar.jsx
 import { Link } from "react-router-dom";
 import "./NavigationBar.css";
+import { HamburgerIcon } from "../hamburgerIcon/HamburgerIcon";
+import { useState } from "react";
 
 export const NavigationBar = () => {
     const userRole = "team-lead"; // "admin", "team-lead", "user"
 
+  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+
+    const handleMobileNavToggle = () => {
+        setMobileNavigationOpen((prev) => !prev);
+    };
+
     if (userRole === "admin") {
         return (
             <nav className="navbar">
-                <ul className="navbar__list">
+                <ul className="navbar__list navbar__list--visible">
                     <li className="navbar__item"><Link className="navbar__link" to="/admin/reset-password">Reset Password</Link></li>
                     <li className="navbar__item"><Link className="navbar__link" to="/admin/approve-team-lead">Approve Team Lead</Link></li>
                     <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa">Setup MFA</Link></li>
@@ -19,8 +26,12 @@ export const NavigationBar = () => {
 
     return (
         <nav className="navbar">
-            <ul className="navbar__list">
-                <li className="navbar__item"><Link className="navbar__link" to="/todos">Todos</Link></li>
+            <section className="navbar__mobile-header">
+                <HamburgerIcon isOpen={mobileNavigationOpen} onClick={handleMobileNavToggle} />
+                <Link className="navbar__brand" to="/">Todonique</Link>
+            </section>
+            <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
+                <li className="navbar__item"><Link className="navbar__link" to="/">Dashboard</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/todos/create">Create Todo</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/invites">Invites</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa">Setup MFA</Link></li>

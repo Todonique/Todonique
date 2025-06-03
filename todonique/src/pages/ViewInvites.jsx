@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { SendTodoUserInvite } from "../components/sendTodoUserInvite/SendTodoUserInvite";
 
 export default function ViewInvites() {
   const [invites, setInvites] = useState([]);
@@ -37,6 +38,7 @@ export default function ViewInvites() {
   return (
     <section>
       <h2>Team Invites</h2>
+      <SendTodoUserInvite />
       {invites.length === 0 ? (
         <p>No invites available.</p>
       ) : (
