@@ -1,0 +1,63 @@
+.dashboard {
+  padding: 2rem;
+}
+
+.dashboard__title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #003d80;
+}
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.team-card {
+  background-color: #ffffff;
+  border: 1px solid #d6e0eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  outline: none;
+}
+
+.team-card:hover,
+.team-card:focus {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.team-card__name {
+  font-size: 1.25rem;
+  color: #0056b3;
+  margin: 0 0 0.5rem;
+}
+
+.team-card__lead,
+.team-card__date {
+  font-size: 0.95rem;
+  color: #333;
+  margin: 0.25rem 0;
+}
+
+@media (max-width: 600px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .dashboard__title {
+    font-size: 1.5rem;
+  }
+
+  .team-card {
+    padding: 1rem;
+  }
+
+  .team-card__name {
+    font-size: 1.1rem;
+  }
+}

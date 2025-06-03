@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./ViewUserInvites.css";
 import { apiRequest } from "../../utils/api";
 
-export default function ViewInvites() {
+export default function ViewUserInvites() {
   const [invites, setInvites] = useState([]);
   const [message, setMessage] = useState("");
 

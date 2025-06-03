@@ -1,10 +1,14 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { NavigationBar } from "../components/navigationBar/NavigationBar";
+import { useState } from "react";
 
 export default function Root() {
+
+  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(true);
+
   return (
     <>
-      <NavigationBar />
+      <NavigationBar mobileNavigationOpen={mobileNavigationOpen} setMobileNavigationOpen={setMobileNavigationOpen} />
       <main><Outlet /></main>
     </>
   );
