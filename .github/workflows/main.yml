@@ -1,0 +1,28 @@
+name: Flyway Migrations
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'flyway/**'
+      - '.github/workflows/flyway.yml'
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_URL: ${{ secrets.DB_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flyway
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/9.22.3/flyway-commandline-9.22.3-linux-x64.tar.gz | tar xvz
+          sudo ln -s $PWD/flyway-9.22.3/flyway /usr/local/bin/flyway
+
+      - name: Run Flyway migrations
+        working-directory: flyway
+        run: flyway migrate -configFiles=flyway.conf
