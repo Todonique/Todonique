@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { SendTodoUserInvite } from "../components/sendTodoUserInvite/SendTodoUserInvite";
+import { useState, useEffect } from "react";
 
-export default function ViewInvites() {
+export default function ViewUserInvites() {
   const [invites, setInvites] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -38,7 +37,6 @@ export default function ViewInvites() {
   return (
     <section>
       <h2>Team Invites</h2>
-      <SendTodoUserInvite />
       {invites.length === 0 ? (
         <p>No invites available.</p>
       ) : (

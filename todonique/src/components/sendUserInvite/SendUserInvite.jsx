@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import "./SendTodoUserInvite.css";
+import "./SendUserInvite.css";
 
 const mockTeams = [
   { team_id: 1, name: "Frontend" },
@@ -8,7 +8,7 @@ const mockTeams = [
   { team_id: 3, name: "Docs" },
 ];
 
-export const SendTodoUserInvite = () => {
+export const SendUserInvite = () => {
   const [username, setUsername] = useState("");
   const [teamId, setTeamId] = useState(mockTeams[0].team_id);
   const [loading, setLoading] = useState(false);

@@ -10,7 +10,7 @@ import UpdateTodo from "./pages/UpdateTodo";
 import ReadTodos from "./pages/readTodos/ReadTodos";
 import ResetPassword from "./pages/ResetPassword";
 import ApproveTeamLead from "./pages/ApproveTeamLead";
-import ViewInvites from "./pages/ViewInvites";
+import Invites from "./pages/invites/Invites";
 import SetupMFA from "./pages/SetupMFA";
 import Dashboard from "./pages/dashboard/Dashboard";
 
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
       { path: "teams/:teamId/todos/update/:todoId", element: <CreateTodo /> },
       { path: "admin/reset-password", element: <ResetPassword /> },
       { path: "admin/approve-team-lead", element: <ApproveTeamLead /> },
-      { path: "invites", element: <ViewInvites /> },
+      { path: "invites", element: <Invites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
       {
         path: "auth",
