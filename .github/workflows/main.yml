@@ -2,10 +2,12 @@ name: Flyway Migrations
 
 on:
   push:
-    branches: [kgothatso/feature/ci-cd, main]
-    paths:
-      - 'flyway/**'
-      - '.github/workflows/flyway.yml'
+    branches:
+      - "kgothatso/feature/ci-cd"
+      - main
+    # paths:
+    #   - 'flyway/**'
+    #   - '.github/workflows/flyway.yml'
 
 jobs:
   migrate:

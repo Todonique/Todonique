@@ -2,10 +2,12 @@ name: Deploy Frontend to S3
 
 on:
   push:
-    branches: [kgothatso/feature/ci-cd, main]
-    paths:
-      - 'todonique/**'
-      - '.github/workflows/deploy-frontend.yml'
+    branches:
+      - "kgothatso/feature/ci-cd"
+      - main
+    # paths:
+    #   - 'todonique/**'
+    #   - '.github/workflows/deploy-frontend.yml'
 
 jobs:
   deploy:
