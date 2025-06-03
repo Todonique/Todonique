@@ -32,7 +32,6 @@ export const NavigationBar = () => {
             </section>
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
                 <li className="navbar__item"><Link className="navbar__link" to="/">Dashboard</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/todos/create">Create Todo</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/invites">Invites</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa">Setup MFA</Link></li>
             </ul>

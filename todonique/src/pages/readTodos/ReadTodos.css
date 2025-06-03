@@ -1,12 +1,17 @@
 .todo {
   padding: 2rem;
-  min-height: 100vh;
+}
+
+.todo__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .todo__title {
   font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #003d80;
+  color: #000;
 }
 
 .todo__loading {
@@ -79,4 +84,70 @@
   .todo-card__title {
     font-size: 1.1rem;
   }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+}
+
+.pagination button:disabled {
+  background-color: #d6d6d6;
+  cursor: not-allowed;
+}
+
+.pagination button:not(:disabled):hover {
+  background-color: #0056b3;
+}
+
+.pagination span {
+  font-weight: 400;
+}
+
+
+.todo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.todo__controls label {
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.todo__controls select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.todo__controls select:focus {
+  border-color: #007bff;
+  outline: none;
 }
