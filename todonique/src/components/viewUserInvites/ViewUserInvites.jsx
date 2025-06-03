@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export default function ViewInvites() {
+export default function ViewUserInvites() {
   const [invites, setInvites] = useState([]);
   const [message, setMessage] = useState("");
 

@@ -1,30 +1,64 @@
-/* NavigationBar.css */
-
 .navbar {
   background-color: #0056b3;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.navbar__brand {
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.navbar__mobile-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .navbar__list {
   list-style: none;
   display: flex;
+  align-items: center;
   gap: 1.5rem;
   margin: 0;
-  padding: 0;
-}
-
-.navbar__item {
-  display: inline;
+  padding: 0 1rem;
 }
 
 .navbar__link {
+  color: white;
   text-decoration: none;
-  color: #eee;
-  font-weight: 500;
-  transition: color 0.3s ease;
 }
 
-.navbar__link:hover {
-  color: #0056b3;
+@media (max-width: 768px) {
+  .navbar__mobile-header {
+    display: flex;
+  }
+
+  .navbar__list {
+    display: none;
+    flex-direction: column;
+    align-items: start;
+    padding: 0;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .navbar__list--visible {
+    display: flex;
+  }
+}
+
+@media (min-width: 769px) {
+  .navbar__mobile-header {
+    display: none;
+  }
+
+  .navbar__list {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+  }
 }
