@@ -6,6 +6,7 @@ import sanitize from 'sanitize-html';
 import { config } from '../config';
 import { extractBearerToken, isBlockedLocation } from '../utils';
 import IPinfoWrapper from 'node-ipinfo';
+import jwt from 'jsonwebtoken';
 
 export const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -21,6 +22,20 @@ export const corsMiddleware = cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 });
 
+export const csPMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Content-Security-Policy',
+        "default-src 'self';" + // Only allow resources from same origin
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval';" + // Scripts from same origin and inline scripts
+        "style-src 'self' 'unsafe-inline';" + // Styles from same origin and inline styles
+        "img-src 'self' data: https:;" + // Images from same origin, data URLs and HTTPS
+        "font-src 'self';" + // Fonts from same origin
+        "frame-src 'none';" + // Prevent iframe usage
+        "object-src 'none';" + // Prevent object/embed usage
+        "base-uri 'self';" + // Restrict base tag
+        "form-action 'self';" // Restrict form submissions to same origin
+    );
+    next();
+};
 export const requestSizeLimiter = (req: Request, res: Response, next: NextFunction) => {
     if (req.headers['content-length'] && 
         parseInt(req.headers['content-length']) > config.maxBytesRequestSize) {
@@ -32,17 +47,15 @@ export const requestSizeLimiter = (req: Request, res: Response, next: NextFuncti
 
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
     if (req.body) {
-        req.body = Object.keys(req.body).map(key => {
-            if (typeof req.body[key] === 'string') {
-                return sanitize(req.body[key] as string, {
-                    allowedTags: config.allowedHTMLTags,
-                    allowedAttributes: config.allowedHTMLAttributes
-                });
-            } else {
-                res.status(400).json({ error: 'Invalid input' });
-                return;
+        req.body = Object.entries(req.body).reduce((acc: Record<string, any>, [key, value]) => {
+            if (typeof value === 'string') {
+              acc[key] = sanitize(value, {
+                allowedTags: config.allowedHTMLTags,
+                allowedAttributes: config.allowedHTMLAttributes
+              });
             }
-        });
+            return acc;
+          }, {});
         next();
     } else {
         res.status(400).json({ error: 'Invalid input' });
