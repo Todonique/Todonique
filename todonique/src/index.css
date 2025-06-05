@@ -54,6 +54,6 @@ a {
   text-decoration: none;
 }
   
-a:hover {
-  text-decoration: underline;
+.title {
+  font-size: 2rem;
 }

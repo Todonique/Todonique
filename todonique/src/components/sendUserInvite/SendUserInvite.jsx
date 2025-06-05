@@ -41,7 +41,7 @@ export const SendUserInvite = () => {
   return (
     <section className="invite-section" aria-labelledby="invite-heading">
       <header>
-        <h1 id="invite-heading">Send Todo User Invite</h1>
+        <h1 className="title">Send Todo User Invite</h1>
       </header>
 
       <form className="invite-form" onSubmit={handleSubmit}>
@@ -49,7 +49,7 @@ export const SendUserInvite = () => {
           <legend>Invite Details</legend>
 
           <p>
-            <label htmlFor="username">Username</label><br />
+            <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
@@ -61,7 +61,7 @@ export const SendUserInvite = () => {
           </p>
 
           <p>
-            <label htmlFor="team">Team</label><br />
+            <label htmlFor="team">Team</label>
             <select
               id="team"
               name="team"

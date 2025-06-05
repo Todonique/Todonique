@@ -1,51 +1,45 @@
 import { useState, useEffect } from "react";
 import "./UpdateTodo.css";
+import { useParams } from "react-router-dom";
 
-// Mock existing todo to update
-const todoToEdit = {
-  id: 42,
-  title: "Fix login bug",
-  description: "Users can't log in after the last patch",
-  assigned_to: 1,
-  team: "Engineering",
-  status: "In Progress"
+// Simulate GET /teams/:teamId/todos/:todoId
+const mockGetTodoById = async (teamId, todoId) => {
+  const mockDatabase =  [
+      { id: 55, title: "Update logo", description: "New brand guidelines", assigned_to: 5, team: "Design", status: "Completed" },
+  ];
+
+  const todos = mockDatabase;
+  return todos.find((todo) => todo.id === parseInt(todoId));
 };
 
-// Mock team data for dropdown
-const mockTeamData = {
-  Engineering: [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
-  ],
-  Marketing: [
-    { id: 3, name: "Charlie" },
-  ],
-  Design: [
-    { id: 4, name: "Diana" },
-    { id: 5, name: "Eli" },
-  ],
-};
+// Simulate GET /teams/:teamId/members
+const mockGetTeamMembers = async () => {
+  const teamMembersDB = [
+      { id: 6, name: "Frank" },
+      { id: 7, name: "Grace" },
+  ];
 
-const mockFetchTeamMembers = async (team) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockTeamData[team] || []);
-    }, 300);
-  });
+  return teamMembersDB;
 };
 
 export default function UpdateTodo() {
-  const [form, setForm] = useState({ ...todoToEdit });
+  const { teamId, todoId } = useParams();
+  const [form, setForm] = useState(null);
   const [teamMembers, setTeamMembers] = useState([]);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      const members = await mockFetchTeamMembers(todoToEdit.team);
+    const fetchData = async () => {
+      const todo = await mockGetTodoById(teamId, todoId);
+      if (todo) setForm(todo);
+      else setMessage("Todo not found.");
+
+      const members = await mockGetTeamMembers(teamId);
       setTeamMembers(members);
     };
-    fetchMembers();
-  }, []);
+
+    fetchData();
+  }, [teamId, todoId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,15 +50,19 @@ export default function UpdateTodo() {
     e.preventDefault();
     if (form.title && form.description && form.assigned_to && form.status) {
       setMessage("Todo updated successfully!");
-      console.log("Updated Todo:", form); // Replace with actual API call
+      console.log("PUT /teams/" + teamId + "/todos/" + todoId, form); // Simulate update
     } else {
       setMessage("Please fill in all fields.");
     }
   };
 
+  if (!form) return <p>Loading...</p>;
+
   return (
     <section className="update-todo">
-      <h2>Update Todo</h2>
+      <header className="title-container">
+        <h1 className="title">Update Todo</h1>
+      </header>
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>
         <input
@@ -84,14 +82,6 @@ export default function UpdateTodo() {
           onChange={handleChange}
           required
         ></textarea>
-
-        <label>Team</label>
-        <input
-          type="text"
-          value={form.team}
-          disabled
-          readOnly
-        />
 
         <label htmlFor="assigned_to">Assign To</label>
         <select
