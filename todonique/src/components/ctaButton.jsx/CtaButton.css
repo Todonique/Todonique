@@ -1,7 +1,7 @@
 .cta-button {
-  --bg: #000;
+  --bg: #333;
   --hover-bg: #007bff;
-  --hover-text: #000;
+  --hover-text: #333;
   color: #fff;
   cursor: pointer;
   border: 1px solid var(--bg);

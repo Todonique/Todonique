@@ -1,0 +1,26 @@
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f7fa;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.landing-page__title {
+  font-size: 3rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.landing-page__subheading {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.landing-page__actions {
+  display: flex;
+  gap: 1rem;
+}
