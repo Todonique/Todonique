@@ -12,13 +12,17 @@ export const NavigationBar = () => {
         setMobileNavigationOpen((prev) => !prev);
     };
 
+    const closeMobileNav = () => {
+        setMobileNavigationOpen(false);
+    };
+
     if (userRole === "admin") {
         return (
             <nav className="navbar">
                 <ul className="navbar__list navbar__list--visible">
-                    <li className="navbar__item"><Link className="navbar__link" to="/admin/reset-password">Reset Password</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/admin/approve-team-lead">Approve Team Lead</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa">Setup MFA</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="/admin/reset-password" onClick={closeMobileNav}>Reset Password</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="/admin/approve-team-lead" onClick={closeMobileNav}>Approve Team Lead</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
                 </ul>
             </nav>
         );
@@ -27,13 +31,14 @@ export const NavigationBar = () => {
     return (
         <nav className="navbar">
             <section className="navbar__mobile-header">
+                <Link className="navbar__brand" to="/" onClick={closeMobileNav}>Todonique</Link>
                 <HamburgerIcon isOpen={mobileNavigationOpen} onClick={handleMobileNavToggle} />
-                <Link className="navbar__brand" to="/">Todonique</Link>
+                
             </section>
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
-                <li className="navbar__item"><Link className="navbar__link" to="/">Dashboard</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/invites">Invites</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa">Setup MFA</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
             </ul>
         </nav>
     );

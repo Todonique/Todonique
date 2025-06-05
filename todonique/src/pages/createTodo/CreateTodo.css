@@ -1,3 +1,7 @@
+.create-todo {
+  padding: 2rem;
+}
+
 .create-todo form {
   display: flex;
   flex-direction: column;

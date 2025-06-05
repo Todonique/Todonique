@@ -13,6 +13,8 @@ import ApproveTeamLead from "./pages/ApproveTeamLead";
 import Invites from "./pages/invites/Invites";
 import SetupMFA from "./pages/SetupMFA";
 import Dashboard from "./pages/dashboard/Dashboard";
+import { SendUserInvite } from "./components/sendUserInvite/SendUserInvite";
+import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,8 @@ const router = createBrowserRouter([
       { path: "admin/reset-password", element: <ResetPassword /> },
       { path: "admin/approve-team-lead", element: <ApproveTeamLead /> },
       { path: "invites", element: <Invites /> },
+      { path: "invites/send", element: <SendUserInvite /> },
+      { path: "invites/sent", element: <ViewSentInvites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
       {
         path: "auth",

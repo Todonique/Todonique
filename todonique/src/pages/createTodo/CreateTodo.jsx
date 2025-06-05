@@ -62,7 +62,9 @@ export default function CreateTodo() {
 
   return (
     <section className="create-todo">
-      <h2 className="create-todo">Create Todo</h2>
+      <header className="title-container">
+      <h1 className="title">Create Todo</h1>
+      </header>
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>
         <input
