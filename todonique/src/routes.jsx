@@ -15,6 +15,7 @@ import SetupMFA from "./pages/SetupMFA";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { SendUserInvite } from "./components/sendUserInvite/SendUserInvite";
 import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
+import LandingPage from "./pages/landingPage/LandingPage";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { path: "invites/send", element: <SendUserInvite /> },
       { path: "invites/sent", element: <ViewSentInvites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
+      { path: "landing", element: <LandingPage /> },
       {
         path: "auth",
         element: <AuthLayout />,
