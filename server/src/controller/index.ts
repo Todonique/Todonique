@@ -1,5 +1,5 @@
 import { registerHandler, loginHandler, setupTwoFactorAuthenticationHandler, verifyTwoFactorHandler } from './authController';
-import { createTodoHandler, updateTodoHandler, deleteTodoHandler, getTodoHandler } from './todoController';
+import { createTodoHandler, updateTodoHandler, getTodosByUserInTeamHandler } from './todoController';
 
 export { registerHandler, loginHandler, setupTwoFactorAuthenticationHandler, verifyTwoFactorHandler, 
-    createTodoHandler, updateTodoHandler, deleteTodoHandler, getTodoHandler };
+    createTodoHandler, updateTodoHandler, getTodosByUserInTeamHandler };

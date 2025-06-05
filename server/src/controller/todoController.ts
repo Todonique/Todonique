@@ -2,6 +2,7 @@ import { CreateTodo, UpdateTodo } from "../models";
 import { Request, Response } from 'express';
 import { ReadTodo } from "../models/todo";
 import { createTodo, getTodo, updateTodo } from "../repository";
+import { getTodosByUserInTeam } from "../repository/todoRepository";
 
 export const createTodoHandler = async (req: Request, res: Response) => {
     try{
@@ -42,20 +43,16 @@ export const updateTodoHandler = async (req: Request, res: Response) => {
     }
 };
 
-export const getTodoHandler = async (req: Request, res: Response) => {
+export const getTodosByUserInTeamHandler = async (req: Request, res: Response) => {
     try{
-        const { todoId } = req.params;
-        if (!todoId) {
-            res.status(400).json({ error: 'Todo ID is required' });
-        } else if (isNaN(Number(todoId))) {
-            res.status(400).json({ error: 'Todo ID must be a number' });
+        const { user_id, team_id } = req.params;
+        if (!user_id || !team_id) {
+            res.status(400).json({ error: 'All fields are required' });
+        } else if (isNaN(Number(user_id)) || isNaN(Number(team_id))) {
+            res.status(400).json({ error: 'User ID and team ID must be numbers' });
         } else{
-            const todo: ReadTodo | undefined = await getTodo(Number(todoId));
-            if (!todo) {
-                res.status(404).json({ error: 'Todo not found' });
-            } else{
-                res.status(200).json({ message: 'Todo retrieved successfully', todo });
-            }
+            const todos: ReadTodo[] = await getTodosByUserInTeam(Number(user_id), Number(team_id));
+            res.status(200).json({ todos });
         }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

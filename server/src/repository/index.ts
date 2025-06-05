@@ -1,3 +1,3 @@
-import { createTodo, getTodo, updateTodo } from "./todoRepository";
+import { createTodo, getTodo, updateTodo, getTodosByUserInTeam } from "./todoRepository";
 
-export { createTodo, getTodo, updateTodo };
+export { createTodo, getTodo, updateTodo, getTodosByUserInTeam };
