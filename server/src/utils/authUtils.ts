@@ -14,6 +14,4 @@ export function extractBearerToken(authorizationHeader?: string): string | undef
     }
 }
 
-export const isBlockedLocation = (ipinfo: IPinfo) => {
-    return config.allowedCities.includes(ipinfo.city);
-}
+export const isBlockedLocation = (ipinfo: IPinfo) => config.allowedCities.includes(ipinfo.city);

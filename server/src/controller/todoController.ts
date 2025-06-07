@@ -1,8 +1,9 @@
 import { CreateTodo, UpdateTodo } from "../models";
 import { Request, Response } from 'express';
 import { ReadTodo } from "../models/todo";
-import { createTodo, getTodo, updateTodo } from "../repository";
+import { createTodo, updateTodo } from "../repository";
 import { getTodosByUserInTeam } from "../repository/todoRepository";
+import { config } from "../config";
 
 export const createTodoHandler = async (req: Request, res: Response) => {
     try{
@@ -14,10 +15,15 @@ export const createTodoHandler = async (req: Request, res: Response) => {
             if (!newTodo) {
                 res.status(404).json({ error: 'Todo not created' });
             } else{
-                res.status(201).json({ message: 'Todo created successfully', todo: newTodo });
+                res.status(201).json(newTodo);
             }
         }
     } catch (error) {
+        if(config.nodeEnv === 'development') {
+            console.error('Error retrieving teams for user:', error);
+        } else{
+            // don't log sensitive information in production
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -25,36 +31,47 @@ export const createTodoHandler = async (req: Request, res: Response) => {
 export const updateTodoHandler = async (req: Request, res: Response) => {
     try{
         const todo: UpdateTodo = req.body;
-        const { todo_id } = req.params;
-        if (!todo.status && !todo.assigned_to && !todo.title && !todo.description && !todo_id) {
+        const todoId = req.params.todoId;
+        if (!todo.status || !todo.assigned_to || !todo.title || !todo.description || !todoId) {
             res.status(400).json({ error: 'All fields are required' });
-        } else if (isNaN(Number(todo_id))) {
+        } else if (isNaN(Number(todoId))) {
             res.status(400).json({ error: 'Todo ID must be a number' });
         } else{
-            const updatedTodo: ReadTodo | undefined = await updateTodo(Number(todo_id), todo);
+            const updatedTodo: ReadTodo | undefined = await updateTodo(Number(todoId), todo);
             if (!updatedTodo) {
                 res.status(404).json({ error: 'Todo not updated' });
             } else{
-                res.status(200).json({ message: 'Todo updated successfully', updatedTodo });
+                res.status(200).json(updatedTodo);
             }
         }
     } catch (error) {
+        if(config.nodeEnv === 'development') {
+            console.error('Error retrieving teams for user:', error);
+        } else{
+            // don't log sensitive information in production
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
 export const getTodosByUserInTeamHandler = async (req: Request, res: Response) => {
     try{
-        const { user_id, team_id } = req.params;
-        if (!user_id || !team_id) {
+        const userId = req.params.userId;
+        const teamId = req.params.teamId;
+        if (!userId || !teamId) {
             res.status(400).json({ error: 'All fields are required' });
-        } else if (isNaN(Number(user_id)) || isNaN(Number(team_id))) {
+        } else if (isNaN(Number(userId)) || isNaN(Number(teamId))) {
             res.status(400).json({ error: 'User ID and team ID must be numbers' });
         } else{
-            const todos: ReadTodo[] = await getTodosByUserInTeam(Number(user_id), Number(team_id));
-            res.status(200).json({ todos });
+            const todos: ReadTodo[] = await getTodosByUserInTeam(Number(userId), Number(teamId));
+            res.status(200).json(todos);
         }
     } catch (error) {
+        if(config.nodeEnv === 'development') {
+            console.error('Error retrieving teams for user:', error);
+        } else{
+            // don't log sensitive information in production
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 }

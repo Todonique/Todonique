@@ -14,6 +14,6 @@ export type Todo = {
     team_name: string;
 }
 
-export type CreateTodo = Omit<Todo, 'todo_id' | 'created_at' | 'assigned_name' | 'created_by_name' | 'team_name'>;
+export type CreateTodo = Omit<Todo, 'todo_id' | 'created_at' | 'assigned_name' | 'created_by_name' | 'team_name' | 'status'>;
 export type UpdateTodo = Omit<Todo, 'todo_id' | 'created_at' | 'assigned_name' | 'created_by' |'created_by_name' | 'team_id' | 'team_name'>;
 export type ReadTodo = Todo;
