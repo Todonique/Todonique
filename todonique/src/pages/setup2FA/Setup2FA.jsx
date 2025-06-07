@@ -9,8 +9,7 @@ const Setup2FA = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const user = location.state?.user;
-  console.log("Username from location state:", user.username);
+  const user = location.state.user? location.state.user: location.state.username || undefined;
 
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
@@ -19,7 +18,6 @@ const Setup2FA = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log("Username from state:", user);
     if (!user) {
       navigate("/auth/register");
     }
@@ -39,7 +37,7 @@ const Setup2FA = () => {
     try {
       const result = await apiRequest('/auth/setup-2fa', {
         method: 'POST',
-        body: { username: user.username },
+        body: { username: user.username? user.username : user },
       });
 
       setQrCode(result.qrCode);
@@ -58,7 +56,7 @@ const Setup2FA = () => {
   const proceedToVerification = () => {
     navigate("/2fa/verify", { 
       state: { 
-        username: user.username,
+        username: user.username? user.username : user,
         secret,
         qrCode 
       }

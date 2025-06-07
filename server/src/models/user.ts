@@ -11,6 +11,7 @@ export type TodoUser = {
 
 export type CreateUser = Omit<TodoUser, 'id' | 'role' | 'hash' | 'salt'> & {
     password: string;
+    roleId?: number; // Optional role ID for user creation
 };
 
 export type AdminUpdateUser = Omit<TodoUser, 'id' | 'hash' | 'salt'>;
@@ -21,7 +22,7 @@ export class UserModel {
     private static readonly SALT_ROUNDS = 12;
 
     static async createUser(userData: CreateUser): Promise<ReadUser> {
-        const { username, password } = userData;
+        const { username, password , roleId} = userData;
         try {
             const salt = await bcrypt.genSalt(this.SALT_ROUNDS);
             const hash = await bcrypt.hash(password, salt);
@@ -33,7 +34,7 @@ export class UserModel {
             
             const values = [username, hash, salt];
             const result = await pool.query(query, values);
-            await this.assignUserRole(result.rows[0].user_id, 3); 
+            await this.assignUserRole(result.rows[0].user_id, roleId?? 3); 
             return result.rows[0];
         } catch (error: any) {
             if (error.code === '23505') {

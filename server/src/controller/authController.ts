@@ -25,7 +25,7 @@ type Verify2FARequest = {
 export const registerHandler = async (req: Request, res: Response) => {
     try {
     
-        const { username, password }: CreateUser =  req.body;
+        const { username, password, roleId }: CreateUser =  req.body;
         if (!username || !password) {
              res.status(400).json({ error: 'username and password are required' });
         }
@@ -35,7 +35,7 @@ export const registerHandler = async (req: Request, res: Response) => {
              res.status(400).json({ error: 'User already exists' });
         }
         
-        const newUser = await UserModel.createUser({ username, password });
+        const newUser = await UserModel.createUser({ username, password , roleId });
         const jwtToken = jwt.sign(
             { 
                 userId: newUser.id,
@@ -114,8 +114,6 @@ export const verifyTwoFactorHandler = async (req: Request, res: Response) => {
                 res.status(404).json({ error: 'User not found' });
             } else {
                 const tempSecret = await UserModel.getTempSecret(user.id);
-                console.log('Temp Secret:', tempSecret);
-                console.log('Provided Secret:', secret);
                 if (!tempSecret || tempSecret !== secret) {
                     res.status(400).json({ error: 'Invalid or expired setup session' });
                 } else {

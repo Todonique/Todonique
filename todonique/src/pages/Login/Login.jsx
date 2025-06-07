@@ -3,7 +3,7 @@ import Button from "../../components/button/Button";
 import Message from "../../components/message/Message";
 import Input from "../../components/inputField/Input";
 import AuthNav from "../../components/AuthNav/AuthNav";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 import { apiRequest } from "../../utils/api";
 
@@ -88,7 +88,6 @@ const useLogin = () => {
         body: requestBody,
         auth: false
       });
-      console.log(result);
 
       if (result.requires2FA) {
         setRequires2FA(true);
@@ -159,110 +158,102 @@ const Login = () => {
   } = useLogin();
 
   return (
-    <div className="login-container">
-      <div className="login-wrapper">
-        <div className="login-header">
-          <h2 className="login-title">
-            {requires2FA ? "Two-Factor Authentication" : "Sign in to your account"}
-          </h2>
-          <p className="login-subtitle">
-            {requires2FA 
-              ? `Enter the 6-digit code from your authenticator app for ${userInfo?.username}`
-              : "Welcome back! Please sign in to continue"
-            }
-          </p>
-        </div>
-        
-        <div className="login-card">
-          {!requires2FA && (
-            <AuthNav
-              links={[
-                { to: "/auth/register", label: "Register" },
-                { to: "/auth/login", label: "Log In?" }
-              ]}
-            />
-          )}
-          
-          <form onSubmit={handleSubmit} className="form-container">
-            {!requires2FA ? (
-              <>
-                <div className="input-group">
-                  <label htmlFor="username" className="input-label">
-                    Username
-                  </label>
-                  <Input
-                    type="text"
-                    name="username"
-                    id="username"
-                    value={form.username}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-                
-                <div className="input-group">
-                  <label htmlFor="password" className="input-label">
-                    Password
-                  </label>
-                  <Input
-                    type="password"
-                    name="password"
-                    id="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <div className="input-group">
-                <label htmlFor="token" className="input-label">
-                  2FA Token
-                </label>
-                <Input
-                  type="text"
-                  name="token"
-                  id="token"
-                  value={form.token}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  placeholder="Enter 6-digit code"
-                  maxLength="6"
-                  required
-                />
-              </div>
-            )}
-            
-            <div className="submit-section">
-              <Button 
-                type="submit" 
+    <main className="login-container">
+  <section className="login-wrapper">
+    <header className="login-header">
+      <h2 className="login-title">
+        {requires2FA ? "Two-Factor Authentication" : "Sign in to your account"}
+      </h2>
+      <p className="login-subtitle">
+        {requires2FA 
+          ? `Enter the 6-digit code from your authenticator app for ${userInfo?.username}`
+          : "Welcome back! Please sign in to continue"
+        }
+      </p>
+    </header>
+    <article className="login-card">
+      <form onSubmit={handleSubmit} className="form-container">
+        {!requires2FA ? (
+          <>
+            <section className="input-group">
+              <label htmlFor="username" className="input-label">
+                Username
+              </label>
+              <Input
+                type="text"
+                name="username"
+                id="username"
+                value={form.username}
+                onChange={handleChange}
                 disabled={isLoading}
-              >
-                {isLoading 
-                  ? (requires2FA ? "Verifying..." : "Signing in...") 
-                  : (requires2FA ? "Verify" : "Sign In")
-                }
-              </Button>
-              
-              {requires2FA && (
-                <Button 
-                  type="button" 
-                  onClick={handleBackToLogin}
-                  disabled={isLoading}
-                  style={{ marginTop: '10px', background: 'transparent', color: '#666' }}
-                >
-                  Back to Login
-                </Button>
-              )}
-            </div>
-          </form>
+                required
+              />
+            </section>
+            
+            <section className="input-group">
+              <label htmlFor="password" className="input-label">
+                Password
+              </label>
+              <Input
+                type="password"
+                name="password"
+                id="password"
+                value={form.password}
+                onChange={handleChange}
+                disabled={isLoading}
+                required
+              />
+            </section>
+          </>
+        ) : (
+          <section className="input-group">
+            <label htmlFor="token" className="input-label">
+              2FA Token
+            </label>
+            <Input
+              type="text"
+              name="token"
+              id="token"
+              value={form.token}
+              onChange={handleChange}
+              disabled={isLoading}
+              placeholder="Enter 6-digit code"
+              maxLength="6"
+              required
+            />
+          </section>
+        )}
+        <nav className="auth-link">
+          <p>Dont have an account? <Link to="/auth/register">Sign up</Link></p>
+        </nav>
+        <section className="submit-section">
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+          >
+            {isLoading 
+              ? (requires2FA ? "Verifying..." : "Signing in...") 
+              : (requires2FA ? "Verify" : "Sign In")
+            }
+          </Button>
           
-          <Message message={message} type={messageType} />
-        </div>
-      </div>
-    </div>
+          {requires2FA && (
+            <Button 
+              type="button" 
+              onClick={handleBackToLogin}
+              disabled={isLoading}
+              style={{ marginTop: '10px', background: 'transparent', color: '#666' }}
+            >
+              Back to Login
+            </Button>
+          )}
+        </section>
+      </form>
+      
+      <Message message={message} type={messageType} />
+    </article>
+  </section>
+</main>
   );
 };
 
