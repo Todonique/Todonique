@@ -53,12 +53,22 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
                 allowedTags: config.allowedHTMLTags,
                 allowedAttributes: config.allowedHTMLAttributes
               });
+            } else if (Array.isArray(value)) {
+              acc[key] = value.map(item =>
+                typeof item === 'string' ? sanitize(item, {
+                    allowedTags: config.allowedHTMLTags,
+                    allowedAttributes: config.allowedHTMLAttributes
+                }) : item
+              );
+            }
+            else {
+                acc[key] = value;
             }
             return acc;
           }, {});
         next();
     } else {
-        res.status(400).json({ error: 'Invalid input' });
+        next();
     }
 };
 

@@ -1,15 +1,25 @@
-import { TodoUser } from ".";
-
 export type Team = {
-    id: number;
+    teamId: number;
     name: string;
-    description: string;
-    owner: number;
+    teamLeadId: number;
+    teamLeadName: string;
+    createdAt: Date;
 };
 
-export type TeamMember = Omit<TodoUser, 'hash' | 'salt'>;
+export type CreateTeam = Omit<Team, 'teamId' | 'createdAt' | 'teamLeadName' | 'joinedAt'>;
+export type UpdateTeam = Omit<Team, 'teamId' | 'createdAt' | 'teamLeadId' | 'teamLeadName' | 'joinedAt'>;
+export type ReadTeam = Omit<Team, 'joinedAt'>;
 
-export type CreateTeam = Omit<Team, 'id' | 'owner'>;
-export type UpdateTeam = Omit<Team, 'id' | 'owner'>;
-export type DeleteTeam = Omit<Team, 'id' | 'owner'>;
-export type ReadTeam = Omit<Team, 'owner'>;
+export type TeamMember = {
+    teamMemberId: number;
+    teamId: number;
+    teamName: string;
+    teamLeadId: number;
+    teamLeadName: string;
+    userId: number;
+    userName: string;
+    joinedAt: Date;
+};
+
+export type ReadTeamMember = TeamMember;
+
