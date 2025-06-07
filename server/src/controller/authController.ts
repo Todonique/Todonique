@@ -101,6 +101,7 @@ export const setupTwoFactorAuthenticationHandler = async (req: Request, res: Res
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 export const verifyTwoFactorHandler = async (req: Request, res: Response) => {
     try {
         const { username, token, secret }: Verify2FARequest = req.body;
@@ -122,7 +123,7 @@ export const verifyTwoFactorHandler = async (req: Request, res: Response) => {
                         secret: tempSecret,
                         encoding: 'base32',
                         token,
-                        window: 2
+                        window: 1
                     });
                       
                     if (!verified) {

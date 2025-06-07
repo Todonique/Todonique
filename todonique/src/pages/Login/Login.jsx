@@ -88,6 +88,7 @@ const useLogin = () => {
         body: requestBody,
         auth: false
       });
+      console.log(result);
 
       if (result.requires2FA) {
         setRequires2FA(true);
@@ -102,11 +103,11 @@ const useLogin = () => {
           setAuthToken(result.token);
         }
         if(result.user.has2FA){
-          navigate("/auth/verify-2fa", { 
+          navigate("/2fa/verify", { 
             state: { user: result.user }
           });
         } else {
-          navigate("/auth/setup-2fa", { 
+          navigate("/2fa/setup", { 
             state: { user: result.user }
           });
         }
