@@ -45,8 +45,8 @@ const router = createBrowserRouter([
       },
       {path: "2fa",        element: <AuthLayout />,
         children: [ 
-          { path: "setup", element: <Setup2FA /> }
-          { path: "verify", element: <Verify2FA /> },
+          { path: "setup", element: <Setup2FA /> },
+          { path: "verify", element: <Verify2FA /> }
         ]  
       }
     ],
