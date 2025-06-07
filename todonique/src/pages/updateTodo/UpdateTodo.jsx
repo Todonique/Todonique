@@ -6,7 +6,7 @@ import CtaButton from "../../components/ctaButton.jsx/CtaButton";
 // Simulate GET /teams/:teamId/todos/:todoId
 const mockGetTodoById = async (teamId, todoId) => {
   const mockDatabase =  [
-      { id: 55, title: "Update logo", description: "New brand guidelines", assigned_to: 5, team: "Design", status: "Completed" },
+      { id: 1, title: "Update logo", description: "New brand guidelines", assigned_to: 5, team: "Design", status: "Completed" },
   ];
 
   const todos = mockDatabase;
