@@ -3,8 +3,13 @@
 }
 
 .title-container {
-  text-align: center;
   margin-bottom: 2rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  max-width: 400px;
+  align-items: center;
+  padding: 2rem;
 }
 
 .update-todo form {
@@ -18,8 +23,11 @@
   background-color: #f9f9f9;
 }
 
-.update-todo label {
+.update-todo label:not(:first-child) {
   margin-top: 1rem;
+}
+
+.update-todo label{
   font-weight: bold;
 }
 

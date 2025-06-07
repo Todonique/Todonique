@@ -27,7 +27,7 @@ const router = createBrowserRouter([
       {path : "/", element: <Dashboard />},
       { path: "teams/:teamId/todos", element: <ReadTodos /> },
       { path: "teams/:teamId/todos/create", element: <CreateTodo /> },
-      { path: "teams/:teamId/todos/update/:todoId", element: <UpdateTodo /> },
+      { path: "teams/:teamId/todos/:todoId", element: <UpdateTodo /> },
       { path: "admin/reset-password", element: <ResetPassword /> },
       { path: "admin/approve-team-lead", element: <ApproveTeamLead /> },
       { path: "invites", element: <Invites /> },
