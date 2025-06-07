@@ -22,18 +22,16 @@ export type Config = {
   allowedCities: string[];
 }
 
-const parseIfSetElseDefault = <T>(envVariable: string | undefined, defaultValue: T): T => {
+const parseIfSetElseDefault = <T>(envVariable: string, defaultValue: T): T => {
   try{
-    if (envVariable) {
       const value = process.env[envVariable];
-      if (value) {
+      if (value && typeof defaultValue === 'object') {
         return JSON.parse(value) as T;
+      } else if (value) {
+        return value as T;
       } else {
         return defaultValue;
       }
-    } else {
-      return defaultValue;
-    }
   } catch (error) {
     return defaultValue;
   }
@@ -45,9 +43,9 @@ export const config: Config = {
   baseURL: parseIfSetElseDefault('BASE_URL', 'http://localhost:3000'),
   jwtSecret: parseIfSetElseDefault('JWT_SECRET', crypto.randomBytes(64).toString('hex')),
   dbHost: parseIfSetElseDefault('DB_HOST', 'localhost'),
-  dbName: parseIfSetElseDefault('DB_NAME', 'Todonique'),
-  dbUser: parseIfSetElseDefault('DB_USER', 'postgres'),
-  dbPort: Number(parseIfSetElseDefault('DB_PORT', '5433')),
+  dbName: parseIfSetElseDefault('DB_NAME', 'todonique'),
+  dbUser: parseIfSetElseDefault('DB_USER', 'root'),
+  dbPort: Number(parseIfSetElseDefault('DB_PORT', '5432')),
   dbPassword: parseIfSetElseDefault('DB_PASSWORD', '12345'),
   allowedOrigins: parseIfSetElseDefault('ALLOWED_ORIGINS', ['http://localhost:3000','http://localhost:5173']),
   maxBytesRequestSize: parseIfSetElseDefault('MAX_REQUEST_SIZE', 10485760),
