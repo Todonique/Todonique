@@ -2,14 +2,14 @@ import { pool } from '../config/pool';
 import bcrypt from 'bcrypt';
 
 export type TodoUser = {
-    user_id: number;
+    id: number;
+    hash: string;
+    salt: string;
     username: string;
-    protected_form: string;
-    two_fa_secret: string;
     role: string;
 };
 
-export type CreateUser = Omit<TodoUser, 'user_id' | 'role' | 'protected_form' | 'two_fa_secret'> & {
+export type CreateUser = Omit<TodoUser, 'id' | 'role' | 'hash' | 'salt'> & {
     password: string;
 };
 
@@ -197,4 +197,3 @@ export const userModel = {
     getUserRole: UserModel.getUserRole.bind(UserModel),
     isAdmin: UserModel.isAdmin.bind(UserModel)
 };
-
