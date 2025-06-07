@@ -197,4 +197,3 @@ export const userModel = {
     getUserRole: UserModel.getUserRole.bind(UserModel),
     isAdmin: UserModel.isAdmin.bind(UserModel)
 };
-

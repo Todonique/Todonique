@@ -1,11 +1,11 @@
 import express from 'express';
-import { createTodoHandler, updateTodoHandler, deleteTodoHandler, getTodoHandler } from '../controller';
+import { createTodoHandler, updateTodoHandler, getTodosByUserInTeamHandler } from '../controller';
+import { authorize } from '../middleware';
 
 const router = express.Router();
 
-router.post('/', createTodoHandler);
-router.put('/:todoId', updateTodoHandler);
-router.delete('/:todoId', deleteTodoHandler);
-router.get('/:todoId', getTodoHandler);
+router.post('/todo', authorize('user'), createTodoHandler);
+router.patch('/todo/:todoId', authorize('user'), updateTodoHandler);
+router.get('/todo/:userId/team/:teamId', authorize('user'), getTodosByUserInTeamHandler);
 
 export default router;

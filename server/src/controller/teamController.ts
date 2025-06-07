@@ -46,7 +46,7 @@ export const insertTeamMemberHandler = async (req: Request, res: Response) => {
             if (!teamMember) {
                 res.status(404).json({ error: 'Team member not created' });
             } else {
-                res.status(200).json({ teamMember });
+                res.status(200).json(teamMember);
             }
         }
     } catch (error) {
@@ -73,7 +73,7 @@ export const updateTeamHandler = async (req: Request, res: Response) => {
             if (!updatedTeam) {
                 res.status(404).json({ error: 'Team not found or not updated' });
             } else {
-                res.status(200).json({ updatedTeam });
+                res.status(200).json(updatedTeam);
             }
         }
     } catch (error) {
@@ -96,7 +96,7 @@ export const deleteTeamHandler = async (req: Request, res: Response) => {
             if (!deletedTeam) {
                 res.status(404).json({ error: 'Team not found or not deleted' });
             } else {
-                res.status(200).json({ deletedTeam });
+                res.status(200).json(deletedTeam);
             }
         }
     } catch (error) {
@@ -121,7 +121,7 @@ export const getTeamMembersHandler = async (req: Request, res: Response) => {
             if (!teamMembers || teamMembers.length === 0) {
                 res.status(404).json({ error: 'No team members found' });
             } else {
-                res.status(200).json({ teamMembers });
+                res.status(200).json(teamMembers);
             }
         }
     } catch (error) {
@@ -146,7 +146,7 @@ export const getTeamsForTodoUserHandler = async (req: Request, res: Response) =>
             if(!teams || teams.length === 0){
                 res.status(404).json({error: "No teams found for this user"});
             } else{
-                res.status(200).json({teams});
+                res.status(200).json(teams);
             }
         }
     } catch(error) {

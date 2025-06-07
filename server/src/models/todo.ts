@@ -1,15 +1,19 @@
-export type TodoStatus = 'pending' | 'completed' | 'in_progress';
+export type TodoStatus = 'pending' | 'completed' | 'in_progress' | 'blocked';
 
 export type Todo = {
-    id: number;
+    todo_id: number;
     title: string;
     description: string;
     status: TodoStatus;
-    createdAt: Date;
-    updatedAt: Date;
-    assignedTo: number;
+    created_at: Date;
+    assigned_to: number;
+    assigned_name: string;
+    created_by: number;
+    created_by_name: string;
+    team_id: number;
+    team_name: string;
 }
 
-export type CreateTodo = Omit<Todo, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'assignedTo'>;
-export type UpdateTodo = Omit<Todo, 'id' | 'createdAt' | 'updatedAt'>;
-export type ReadTodo = Omit<Todo, 'assignedTo'>;
+export type CreateTodo = Omit<Todo, 'todo_id' | 'created_at' | 'assigned_name' | 'created_by_name' | 'team_name' | 'status'>;
+export type UpdateTodo = Omit<Todo, 'todo_id' | 'created_at' | 'assigned_name' | 'created_by' |'created_by_name' | 'team_id' | 'team_name'>;
+export type ReadTodo = Todo;
