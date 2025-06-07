@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerHandler, loginHandler, setupTwoFactorAuthenticationHandler, verifyTwoFactorHandler } from '../controller';
+import { loginHandler, setupTwoFactorAuthenticationHandler, verifyTwoFactorHandler, registerHandler } from '../controller/authController';
 
 const router = express.Router();
 

@@ -1,0 +1,67 @@
+.update-todo {
+  padding: 2rem;
+}
+
+.title-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.update-todo form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.update-todo label {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.update-todo input[type="text"],
+.update-todo textarea,
+.update-todo select {
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.update-todo textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.update-todo button {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.update-todo button:hover {
+  background-color: #0056b3;
+}
+
+.update-todo p {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.update-todo h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #333;
+}
