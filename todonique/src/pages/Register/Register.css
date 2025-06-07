@@ -1,0 +1,82 @@
+/* Register Container Styles */
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 3rem 1rem;
+}
+
+.register-wrapper {
+  max-width: 28rem;
+  width: 100%;
+}
+
+/* Header Styles */
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Card Styles */
+.register-card {
+  background: white;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+
+/* Form Styles */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* Submit Section */
+.submit-section {
+  padding-top: 0.5rem;
+}
+
+.password-criteria ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.password-criteria li {
+  font-size: 0.9rem;
+}
+
+.password-criteria .valid {
+  color: green;
+}
+
+.password-criteria .invalid {
+  color: red;
+}
