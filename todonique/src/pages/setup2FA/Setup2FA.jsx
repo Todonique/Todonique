@@ -3,12 +3,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../../components/button/Button";
 import Message from "../../components/message/Message";
 import { apiRequest } from "../../utils/api";
+import "./Setup2FA.css";
 
 const Setup2FA = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const username = location.state?.username;
+  const user = location.state?.user;
+  console.log("Username from location state:", user.username);
 
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
@@ -16,30 +18,28 @@ const Setup2FA = () => {
   const [messageType, setMessageType] = useState("info");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if no username provided
   useEffect(() => {
-    console.log("Username from state:", username);
-    if (!username) {
+    console.log("Username from state:", user);
+    if (!user) {
       navigate("/auth/register");
     }
-  }, [username, navigate]);
+  }, [user, navigate]);
 
   // Auto-setup 2FA when component mounts
   useEffect(() => {
-    if (username) {
+    if (user) {
       setup2FA();
     }
-  }, [username]);
+  }, [user]);
 
   const setup2FA = async () => {
-    console.log("Setting up 2FA for user:", username);
     setIsLoading(true);
     setMessage("");
 
     try {
       const result = await apiRequest('/auth/setup-2fa', {
         method: 'POST',
-        body: { username }
+        body: { username: user.username },
       });
 
       setQrCode(result.qrCode);
@@ -56,9 +56,9 @@ const Setup2FA = () => {
   };
 
   const proceedToVerification = () => {
-    navigate("/auth/verify-2fa", { 
+    navigate("/2fa/verify", { 
       state: { 
-        username,
+        username: user.username,
         secret,
         qrCode 
       }
@@ -71,7 +71,7 @@ const Setup2FA = () => {
     });
   };
 
-  if (!username) {
+  if (!user) {
     return null; // Will redirect via useEffect
   }
 

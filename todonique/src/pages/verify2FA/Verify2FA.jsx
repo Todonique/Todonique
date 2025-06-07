@@ -4,6 +4,7 @@ import Button from "../../components/button/Button";
 import Message from "../../components/message/Message";
 import Input from "../../components/inputField/Input";
 import { apiRequest } from "../../utils/api";
+import "./Verify2FA.css";
 
 const Verify2FA = () => {
   const navigate = useNavigate();
@@ -83,12 +84,6 @@ const Verify2FA = () => {
   const goBackToSetup = () => {
     navigate("/auth/setup-2fa", { 
       state: { username }
-    });
-  };
-
-  const skipSetup = () => {
-    navigate("/auth/login", { 
-      state: { message: "Registration complete! You can set up 2FA later in your account settings." }
     });
   };
 
