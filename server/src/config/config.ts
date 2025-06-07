@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import sanitize from 'sanitize-html';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ export type Config = {
   dbName: string;
   dbUser: string;
   dbPassword: string;
+  dbPort: number;
   allowedOrigins: string[];
   maxBytesRequestSize: number;
   allowedHTMLTags: string[];
@@ -41,12 +43,13 @@ export const config: Config = {
   port: Number(parseIfSetElseDefault('PORT', '3000')) || 3000,
   nodeEnv: parseIfSetElseDefault('NODE_ENV', 'development'),
   baseURL: parseIfSetElseDefault('BASE_URL', 'http://localhost:3000'),
-  jwtSecret: parseIfSetElseDefault('JWT_SECRET', 'your-secret-key'),
+  jwtSecret: parseIfSetElseDefault('JWT_SECRET', crypto.randomBytes(64).toString('hex')),
   dbHost: parseIfSetElseDefault('DB_HOST', 'localhost'),
-  dbName: parseIfSetElseDefault('DB_NAME', 'todo_app'),
+  dbName: parseIfSetElseDefault('DB_NAME', 'Todonique'),
   dbUser: parseIfSetElseDefault('DB_USER', 'postgres'),
-  dbPassword: parseIfSetElseDefault('DB_PASSWORD', 'postgres'),
-  allowedOrigins: parseIfSetElseDefault('ALLOWED_ORIGINS', ['http://localhost:3000']),
+  dbPort: Number(parseIfSetElseDefault('DB_PORT', '5433')),
+  dbPassword: parseIfSetElseDefault('DB_PASSWORD', '12345'),
+  allowedOrigins: parseIfSetElseDefault('ALLOWED_ORIGINS', ['http://localhost:3000','http://localhost:5173']),
   maxBytesRequestSize: parseIfSetElseDefault('MAX_REQUEST_SIZE', 10485760),
   allowedHTMLTags: parseIfSetElseDefault('ALLOWED_HTML_TAGS', sanitize.defaults.allowedTags),
   allowedHTMLAttributes: parseIfSetElseDefault('ALLOWED_HTML_ATTRIBUTES', sanitize.defaults.allowedAttributes),
