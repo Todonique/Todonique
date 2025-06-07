@@ -1,60 +1,75 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./CreateTodo.css";
-
-// Mock data source
-const mockTeamData = {
-  Engineering: [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
-  ],
-  Marketing: [
-    { id: 3, name: "Charlie" },
-  ],
-  Design: [
-    { id: 4, name: "Diana" },
-    { id: 5, name: "Eli" },
-  ],
-};
-
-// Mock API function
-const mockFetchTeamMembers = async (team) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockTeamData[team] || []);
-    }, 300); // Simulate delay
-  });
-};
+import { apiRequest } from "../../utils/api";
+import { useParams } from "react-router-dom";
 
 export default function CreateTodo() {
+  const { teamId } = useParams();
   const [form, setForm] = useState({
     title: "",
     description: "",
     assigned_to: "",
-    team: "",
+    team: teamId,
     status: "Pending",
   });
-
+  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [teamMembers, setTeamMembers] = useState([]);
-  const userTeams = ["Engineering", "Marketing", "Design"];
 
-  const handleChange = async (e) => {
-    const { name, value } = e.target;
-
-    if (name === "team") {
-      const members = await mockFetchTeamMembers(value);
-      setTeamMembers(members);
-      setForm({ ...form, team: value, assigned_to: "" });
-    } else {
-      setForm({ ...form, [name]: value });
+  const fetchTeamMembers = async () => {
+    setLoading(true);
+    try {
+      const teamMembers = await apiRequest(`/teams/team/${teamId}/members`);
+      setTeamMembers(teamMembers);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (teamId) {
+      fetchTeamMembers();
+    }
+  }, [teamId]);
+
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.title && form.description && form.assigned_to && form.team && form.status) {
-      setMessage("Todo created successfully!");
-      console.log(form); // Replace with API call
+    if (form.title && form.description && form.status) {
+
+      const requestBody = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        team: parseInt(form.team, 10),
+        assigned_to: form.assigned_to,
+        status: form.status,
+      };
+
+      try {
+        setSubmitLoading(true);
+        await apiRequest('todos/todo', {
+          method: 'POST',
+          body: requestBody,
+          auth: false,
+        });
+        setMessage("Todo created successfully!");
+        setForm((prev) => ({
+          ...prev,
+          title: "",
+          description: "",
+          assigned_to: "",
+          status: "Pending",
+        }));
+      } catch {
+        setMessage("Error creating todo.");
+      } finally {
+        setSubmitLoading(false);
+      }
     } else {
       setMessage("Please fill in all fields.");
     }
@@ -63,7 +78,7 @@ export default function CreateTodo() {
   return (
     <section className="create-todo">
       <header className="title-container">
-      <h1 className="title">Create Todo</h1>
+        <h1 className="title">Create Todo</h1>
       </header>
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>
@@ -85,22 +100,6 @@ export default function CreateTodo() {
           required
         ></textarea>
 
-        <label htmlFor="team">Team</label>
-        <select
-          id="team"
-          name="team"
-          value={form.team}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select a team</option>
-          {userTeams.map((team) => (
-            <option key={team} value={team}>
-              {team}
-            </option>
-          ))}
-        </select>
-
         <label htmlFor="assigned_to">Assign To</label>
         <select
           id="assigned_to"
@@ -117,6 +116,10 @@ export default function CreateTodo() {
             </option>
           ))}
         </select>
+        {loading && <p>Loading team members...</p>}
+        {!loading && teamMembers.length === 0 && (
+          <p>No team members available for this team.</p>
+        )}
 
         <label htmlFor="status">Status</label>
         <select
@@ -131,7 +134,9 @@ export default function CreateTodo() {
           <option value="Completed">Completed</option>
         </select>
 
-        <button type="submit">Create Todo</button>
+        <button type="submit" disabled={submitLoading}>
+          {submitLoading ? "Creating..." : "Create Todo"}
+        </button>
       </form>
       {message && <p>{message}</p>}
     </section>

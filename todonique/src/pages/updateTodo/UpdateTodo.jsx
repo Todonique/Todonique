@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./UpdateTodo.css";
 import { useParams } from "react-router-dom";
+import CtaButton from "../../components/ctaButton.jsx/CtaButton";
 
 // Simulate GET /teams/:teamId/todos/:todoId
 const mockGetTodoById = async (teamId, todoId) => {
@@ -27,6 +28,8 @@ export default function UpdateTodo() {
   const [form, setForm] = useState(null);
   const [teamMembers, setTeamMembers] = useState([]);
   const [message, setMessage] = useState("");
+
+  const [edit, setEdit] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,7 +64,8 @@ export default function UpdateTodo() {
   return (
     <section className="update-todo">
       <header className="title-container">
-        <h1 className="title">Update Todo</h1>
+        <h1 className="title">{edit ? "Update Todo" : "View Todo"}</h1>
+        <CtaButton text={edit ? "Cancel" : "Update Todo"} onClick={() => setEdit(!edit)} />
       </header>
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>
@@ -71,15 +75,16 @@ export default function UpdateTodo() {
           name="title"
           value={form.title}
           onChange={handleChange}
+          disabled={!edit}
           required
         />
-
         <label htmlFor="description">Description</label>
         <textarea
           id="description"
           name="description"
           value={form.description}
           onChange={handleChange}
+          disabled={!edit}
           required
         ></textarea>
 
@@ -89,6 +94,7 @@ export default function UpdateTodo() {
           name="assigned_to"
           value={form.assigned_to}
           onChange={handleChange}
+          disabled={!edit}
           required
         >
           <option value="">Select a team member</option>
@@ -105,16 +111,21 @@ export default function UpdateTodo() {
           name="status"
           value={form.status}
           onChange={handleChange}
+          disabled={!edit}
           required
         >
           <option value="Pending">Pending</option>
           <option value="In Progress">In Progress</option>
           <option value="Completed">Completed</option>
         </select>
-
-        <button type="submit">Update Todo</button>
+        {edit && (
+          <CtaButton
+          type="submit"
+          text="Update Todo"
+          />
+        )}
       </form>
-      {message && <p>{message}</p>}
+      {message && edit && <p>{message}</p>}
     </section>
   );
 }
