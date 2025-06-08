@@ -28,6 +28,18 @@ export const NavigationBar = () => {
         );
     }
 
+    if (userRole === "team-lead") {
+        return (
+            <nav className="navbar">
+                <ul className="navbar__list navbar__list--visible">
+                    <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
+                </ul>
+            </nav>
+        );
+    }
+
     return (
         <nav className="navbar">
             <section className="navbar__mobile-header">
