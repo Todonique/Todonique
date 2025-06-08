@@ -3,26 +3,7 @@ import "./UpdateTodo.css";
 import { useParams } from "react-router-dom";
 import CtaButton from "../../components/ctaButton.jsx/CtaButton";
 import { apiRequest } from "../../utils/api";
-
-// Simulate GET /teams/:teamId/todos/:todoId
-const mockGetTodoById = async (teamId, todoId) => {
-  const mockDatabase =  [
-      { id: 1, title: "Update logo", description: "New brand guidelines", assigned_to: 5, team: "Design", status: "Completed" },
-  ];
-
-  const todos = mockDatabase;
-  return todos.find((todo) => todo.id === parseInt(todoId));
-};
-
-// Simulate GET /teams/:teamId/members
-const mockGetTeamMembers = async () => {
-  const teamMembersDB = [
-      { id: 6, name: "Frank" },
-      { id: 7, name: "Grace" },
-  ];
-
-  return teamMembersDB;
-};
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function UpdateTodo() {
   const { teamId, todoId } = useParams();
@@ -32,20 +13,16 @@ export default function UpdateTodo() {
 
   const [edit, setEdit] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const todo = await mockGetTodoById(teamId, todoId);
-  //     if (todo) setForm(todo);
-  //     else setMessage("Todo not found.");
+  const fetchTeamMemebers = async () => {
+  console.log("Fetching team members for teamId:", teamId);
+    const result = await apiRequest(`/teams/team/${teamId}/members`, {
+      method: "GET",
+      auth: true,
+    });
+    setTeamMembers(result);
+    console.log("Fetched team members:", result);
+  };
 
-  //     const members = await mockGetTeamMembers(teamId);
-  //     setTeamMembers(members);
-  //   };
-
-  //   fetchData();
-  // }, [teamId, todoId]);
-
-  
   const fetchTodo = async () => {
    console.log("Fetching todo with teamId:", teamId, "and todoId:", todoId);
     const result = await apiRequest(`/todos/todo/${todoId}`,
@@ -55,14 +32,14 @@ export default function UpdateTodo() {
       }
     );
     setForm(result);
-    console.log(result)
-    
+    console.log("Fetched team members:", result);
   };
 
 
 
   useEffect(() => {
     if (teamId && todoId) {
+      fetchTeamMemebers();
       fetchTodo();
     }
   }, [teamId, todoId]);
@@ -72,19 +49,44 @@ export default function UpdateTodo() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (form.title && form.description && form.assigned_to && form.status) {
-      setMessage("Todo updated successfully!");
-      console.log("PUT /teams/" + teamId + "/todos/" + todoId, form); // Simulate update
+      try {
+        await apiRequest(`/todos/todo/${todoId}`, {
+          method: "PATCH",
+          body: form,
+          auth: true,
+        });
+        toast.success('Successfuly updated todo.', {
+          position: "bottom-right",
+          autoClose: 4000,
+          closeOnClick: true,
+          draggable: false
+        });
+        setEdit(false);
+      } catch (error) {
+        toast.error(`Error updating todo. ${error}`, {
+          position: "bottom-right",
+          autoClose: 4000,
+          closeOnClick: true,
+          draggable: false
+        });
+      }
     } else {
-      setMessage("Please fill in all fields.");
-    }
+      toast.warn('Please fill in all fields.', {
+        position: "bottom-right",
+        autoClose: 4000,
+        closeOnClick: true,
+        draggable: false
+      });
+    };
   };
 
   if (!form) return <p>Loading...</p>;
 
   return (
+    <>
     <section className="update-todo">
       <header className="title-container">
         <h1 className="title">{edit ? "Update Todo" : "View Todo"}</h1>
@@ -122,8 +124,8 @@ export default function UpdateTodo() {
         >
           <option value="">Select a team member</option>
           {teamMembers.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
+            <option key={member.userId} value={member.userId}>
+              {member.userName}
             </option>
           ))}
         </select>
@@ -137,9 +139,9 @@ export default function UpdateTodo() {
           disabled={!edit}
           required
         >
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
         </select>
         {edit && (
           <CtaButton
@@ -149,6 +151,10 @@ export default function UpdateTodo() {
         )}
       </form>
       {message && edit && <p>{message}</p>}
+      
     </section>
+    
+    <ToastContainer />
+    </>
   );
 }
