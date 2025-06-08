@@ -1,0 +1,25 @@
+.reporting {
+    padding: 2rem;
+}
+
+.reporting__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.reporting__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.reporting__table th,
+.reporting__table td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.reporting__table th {
+    background-color: #f2f2f2;
+}
