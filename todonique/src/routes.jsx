@@ -19,6 +19,7 @@ import { SendUserInvite } from "./components/sendUserInvite/SendUserInvite";
 import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
 import LandingPage from "./pages/landingPage/LandingPage";
 import Reporting from "./components/Reporting/Reporting";
+import CreateTeamForm from "./components/CreateTeamForm/CreateTeamForm";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: "teams/:teamId/todos/create", element: <CreateTodo /> },
       { path: "teams/:teamId/todos/:todoId", element: <UpdateTodo /> },
       { path: "teams/:teamId/todos/:todoId/reporting", element: <Reporting /> },
+      { path: "teams/create", element: <CreateTeamForm /> },
       { path: "admin/reset-password", element: <ResetPassword /> },
       { path: "admin/approve-team-lead", element: <ApproveTeamLead /> },
       { path: "invites", element: <Invites /> },
