@@ -49,9 +49,7 @@ export default function ReadTodos() {
 
   const fetchTeamTodos = async () => {
     try {
-      // TODO extract userId corretly or rather do in backend
-      const userId = 1;
-      const result = await apiRequest(`/todos/todo/${userId}/team/${teamId}`, {
+      const result = await apiRequest(`/todos/todo/team/${teamId}`, {
         method: 'GET',
         auth: true,
       });
