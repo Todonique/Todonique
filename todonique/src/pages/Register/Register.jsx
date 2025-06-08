@@ -154,8 +154,9 @@ const useRegister = () => {
 
       setMessage("Registration successful! Welcome to our platform.");
       setMessageType("success");
-      if (result.token) {
-        setAuthToken(result.token);
+      console.log("Registration result:", result);
+      if (result.jwtToken) {
+        setAuthToken(result.jwtToken);
       }
       navigate("/2fa/setup", { 
         state: { username: form.username.trim() }
