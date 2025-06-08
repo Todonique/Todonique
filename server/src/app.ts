@@ -5,6 +5,7 @@ import { rateLimiter, securityHeaders,
     authenticate, authorize, locationCheck } from './middleware';
 import IPinfoWrapper from 'node-ipinfo';
 import { config } from './config';
+import adminRoutes from './routes/adminRoutes';
 
 const ipinfoWrapper = new IPinfoWrapper(config.ipinfoToken);
 const app = express();
@@ -23,5 +24,7 @@ app.use('/api/teams', authenticate, locationCheck(ipinfoWrapper), teamRoutes);
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');
 });
+
+app.use('/api/admin', authenticate, authorize('admin'), locationCheck(ipinfoWrapper), adminRoutes);
 
 export default app;

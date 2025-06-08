@@ -20,6 +20,8 @@ import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
 import LandingPage from "./pages/landingPage/LandingPage";
 import Reporting from "./components/Reporting/Reporting";
 import CreateTeamForm from "./components/CreateTeamForm/CreateTeamForm";
+import AdminRoleManagement from "./pages/admin/AdminRoleManagement";
+import AdminResetPassword from "./pages/admin/AdminResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,8 @@ const router = createBrowserRouter([
       { path: "invites/sent", element: <ViewSentInvites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
       { path: "landing", element: <LandingPage /> },
+      { path: "admin/roles", element: <AdminRoleManagement /> },
+      { path: "admin/reset-user-password", element: <AdminResetPassword /> },
       {
         path: "auth",
         element: <AuthLayout />,
