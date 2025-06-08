@@ -8,8 +8,8 @@ const router = express.Router();
 router.post('/todo', authorize('user'), createTodoHandler);
 router.patch('/todo/:todoId', authorize('user'), updateTodoHandler);
 router.patch('/todo/:todoId', authorize('teamlead'), updateTodoHandler);
-router.get('/todo/:todoId', authorize('user'), getTodoByIdHandler);
-router.get('/todo/:userId/team/:teamId', authorize('user'), getTodosByUserInTeamHandler);
+router.get('/todos/team/:teamId', authorize('user'), getTodosByUserInTeamHandler);
+router.get('/todo/:userId/team/:teamId', authorize('teamlead'), getTodosByUserInTeamHandler);
 router.get('/todo/team/:teamId', authorize('user'), getTodosByTeamHandler);
 
 export default router;

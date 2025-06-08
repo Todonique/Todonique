@@ -112,8 +112,8 @@ export const authorize = (requiredRole: string) => {
 
 export const locationCheck = (ipinfoWrapper: IPinfoWrapper) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        if (process.env.NODE_ENV !== 'development') {
-            return next();
+        if (config.nodeEnv === 'development') {
+            next();
         } else{
             let clientIP = req.ip;
             // If localhost, try to get real IP from X-Forwarded-For

@@ -2,6 +2,7 @@ import { Todo, CreateTodo, UpdateTodo, ReadTodo } from './todo';
 import { TodoUser, CreateUser, ReadUser, AdminUpdateUser } from './user';
 import { Team, CreateTeam, UpdateTeam, ReadTeam, TeamMember } from './team';
 import {Role} from './roles';
+import { TodoHistory } from './todoHistory';
 
 export { 
     Todo, 
@@ -15,5 +16,8 @@ export {
     AdminUpdateUser,
     Team, 
     CreateTeam, 
-    UpdateTeam, ReadTeam, TeamMember 
+    UpdateTeam, 
+    ReadTeam, 
+    TeamMember,
+    TodoHistory
 };
