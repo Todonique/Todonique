@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     children: [
-      {path : "/", element: <Dashboard />},
+      { path: "/", element: <Dashboard /> },
       { path: "teams/:teamId/todos", element: <ReadTodos /> },
       { path: "teams/:teamId/todos/create", element: <CreateTodo /> },
       { path: "teams/:teamId/todos/:todoId", element: <UpdateTodo /> },
@@ -39,20 +39,24 @@ const router = createBrowserRouter([
       { path: "invites/sent", element: <ViewSentInvites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
       { path: "landing", element: <LandingPage /> },
-      {
-        path: "auth",
-        element: <AuthLayout />,
-        children: [
-          { path: "login", element: <Login /> },
-          { path: "register", element: <Register /> },
-        ],
-      },
-      {path: "2fa",        element: <AuthLayout />,
-        children: [ 
-          { path: "setup", element: <Setup2FA /> },
-          { path: "verify", element: <Verify2FA /> }
-        ]  
-      }
+    ],
+  },
+
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+    ],
+  },
+
+  {
+    path: "/2fa",
+    element: <AuthLayout />,
+    children: [
+      { path: "setup", element: <Setup2FA /> },
+      { path: "verify", element: <Verify2FA /> },
     ],
   },
 ]);
