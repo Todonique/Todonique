@@ -2,7 +2,7 @@ import { CreateTodo, UpdateTodo } from "../models";
 import { Request, Response } from 'express';
 import { ReadTodo } from "../models/todo";
 import { createTodo, updateTodo } from "../repository";
-import { getTodosByUserInTeam } from "../repository/todoRepository";
+import { getTodosByTeam, getTodosByUserInTeam } from "../repository/todoRepository";
 import { config } from "../config";
 
 export const createTodoHandler = async (req: Request, res: Response) => {
@@ -64,6 +64,28 @@ export const getTodosByUserInTeamHandler = async (req: Request, res: Response) =
             res.status(400).json({ error: 'User ID and team ID must be numbers' });
         } else{
             const todos: ReadTodo[] = await getTodosByUserInTeam(Number(userId), Number(teamId));
+            res.status(200).json(todos);
+        }
+    } catch (error) {
+        if(config.nodeEnv === 'development') {
+            console.error('Error retrieving teams for user:', error);
+        } else{
+            // don't log sensitive information in production
+        }
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export const getTodosByTeamHandler = async (req: Request, res: Response) => {
+    try{
+        const userId = req.params.userId || res.locals.user?.userId;
+        const teamId = req.params.teamId;
+        if (!userId || !teamId) {
+            res.status(400).json({ error: 'All fields are required' });
+        } else if (isNaN(Number(userId)) || isNaN(Number(teamId))) {
+            res.status(400).json({ error: 'User ID and team ID must be numbers' });
+        } else{
+            const todos: ReadTodo[] = await getTodosByTeam(Number(teamId), Number(userId));
             res.status(200).json(todos);
         }
     } catch (error) {

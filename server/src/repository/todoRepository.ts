@@ -119,3 +119,29 @@ export async function getTodosByUserInTeam(userId: number, teamId: number): Prom
 
     return todoSelection.rows;
 }
+
+export async function getTodosByTeam(teamId: number, userId: number): Promise<ReadTodo[]> {
+    const todoSelection = await pool.query<ReadTodo>(`
+        SELECT
+            todos.todo_id,
+            todos.title,
+            todos.description,
+            todo_status.todo_status_name AS status,
+            todos.created_at,
+            todos.assigned_to,
+            users.username AS assigned_name,
+            todos.created_by,
+            creator.username AS created_by_name,
+            todos.team_id,
+            teams.name AS team_name
+        FROM todos
+        JOIN todo_status ON todos.todo_status_id = todo_status.todo_status_id
+        LEFT JOIN users ON todos.assigned_to = users.user_id
+        JOIN users AS creator ON todos.created_by = creator.user_id
+        JOIN teams ON todos.team_id = teams.team_id
+        JOIN team_members ON teams.team_id = team_members.team_id
+        WHERE todos.team_id = $1 AND team_members.user_id = $2
+    `, [teamId, userId]);
+
+    return todoSelection.rows;
+}
