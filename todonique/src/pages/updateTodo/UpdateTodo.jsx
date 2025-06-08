@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./UpdateTodo.css";
 import { useParams } from "react-router-dom";
 import CtaButton from "../../components/ctaButton.jsx/CtaButton";
+import { apiRequest } from "../../utils/api";
 
 // Simulate GET /teams/:teamId/todos/:todoId
 const mockGetTodoById = async (teamId, todoId) => {
@@ -31,17 +32,39 @@ export default function UpdateTodo() {
 
   const [edit, setEdit] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const todo = await mockGetTodoById(teamId, todoId);
+  //     if (todo) setForm(todo);
+  //     else setMessage("Todo not found.");
+
+  //     const members = await mockGetTeamMembers(teamId);
+  //     setTeamMembers(members);
+  //   };
+
+  //   fetchData();
+  // }, [teamId, todoId]);
+
+  
+  const fetchTodo = async () => {
+   console.log("Fetching todo with teamId:", teamId, "and todoId:", todoId);
+    const result = await apiRequest(`/todos/todo/${todoId}`,
+      {
+        method: "GET",
+        auth: true,
+      }
+    );
+    setForm(result);
+    console.log(result)
+    
+  };
+
+
+
   useEffect(() => {
-    const fetchData = async () => {
-      const todo = await mockGetTodoById(teamId, todoId);
-      if (todo) setForm(todo);
-      else setMessage("Todo not found.");
-
-      const members = await mockGetTeamMembers(teamId);
-      setTeamMembers(members);
-    };
-
-    fetchData();
+    if (teamId && todoId) {
+      fetchTodo();
+    }
   }, [teamId, todoId]);
 
   const handleChange = (e) => {
