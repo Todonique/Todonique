@@ -4,7 +4,8 @@ CREATE TABLE users (
     password_hash VARCHAR(128) NOT NULL,
     password_salt VARCHAR(32) NOT NULL,
     protected_form VARCHAR(128),
-    two_fa_secret VARCHAR(20),
+    temp_2fa_secret VARCHAR(32),
+    two_fa_secret VARCHAR(32),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
