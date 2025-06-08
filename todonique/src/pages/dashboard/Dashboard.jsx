@@ -1,40 +1,34 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { apiRequest } from '../../utils/api';
 
-// Mock team data
-const teams = [
-  {
-    team_id: 1,
-    name: 'Engineering',
-    team_lead: 'Alice Johnson',
-    created_at: '2024-01-15',
-  },
-  {
-    team_id: 2,
-    name: 'Marketing',
-    team_lead: 'Bob Smith',
-    created_at: '2024-03-22',
-  },
-  {
-    team_id: 3,
-    name: 'Product Design',
-    team_lead: 'Carla Gomez',
-    created_at: '2023-11-02',
-  },
-  {
-    team_id: 4,
-    name: 'QA Team',
-    team_lead: 'Daniel White',
-    created_at: '2024-02-18',
-  },
-];
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [teams, setTeams] = useState([]);
+
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   const handleTeamClick = (teamId) => {
     navigate(`/teams/${teamId}/todos`);
   };
+
+  const fetchTeams = async () => {
+    try {
+      const result = await apiRequest(`/teams/teams`, {
+        method: 'GET',
+        auth: true,
+      });
+      setTeams(result);
+    } catch (error) {
+      console.error("Error fetching teams:", error);
+      // TODO Handle error
+    };
+    // Loading state
+  };
+  
 
   return (
     <main className="dashboard">
@@ -42,24 +36,29 @@ const Dashboard = () => {
         <h1 className="dashboard__title">Teams</h1>
       </header>
 
+      {teams && teams.length > 0 ? (
+
       <section className="dashboard__grid">
         {teams.map((team) => (
           <article
-            key={team.team_id}
+            key={team.teamId}
             className="team-card"
-            onClick={() => handleTeamClick(team.team_id)}
+            onClick={() => handleTeamClick(team.teamId)}
             role="button"
             tabIndex="0"
-            onKeyDown={(e) => e.key === 'Enter' && handleTeamClick(team.team_id)}
+            onKeyDown={(e) => e.key === 'Enter' && handleTeamClick(team.teamId)}
           >
             <header>
               <h2 className="team-card__name">{team.name}</h2>
             </header>
-            <p className="team-card__lead"><strong>Lead:</strong> {team.team_lead}</p>
-            <p className="team-card__date"><strong>Created:</strong> {new Date(team.created_at).toLocaleDateString()}</p>
+            <p className="team-card__lead"><strong>Lead:</strong> {team.teamLeadName}</p>
+            <p className="team-card__date"><strong>Created:</strong> {new Date(team.createdAt).toLocaleDateString()}</p>
           </article>
         ))}
       </section>
+      ) : (
+        <p className="dashboard__no-teams">No teams available.</p>
+      )}
     </main>
   );
 };
