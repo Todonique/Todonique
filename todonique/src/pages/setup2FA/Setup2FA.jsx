@@ -9,8 +9,7 @@ const Setup2FA = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const user = location.state?.user;
-  console.log("Username from location state:", user.username);
+  const user = location.state?.username;
 
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
@@ -39,9 +38,8 @@ const Setup2FA = () => {
     try {
       const result = await apiRequest('/auth/setup-2fa', {
         method: 'POST',
-        body: { username: user.username },
+        body: { username: user },
       });
-
       setQrCode(result.qrCode);
       setSecret(result.secret);
       setMessage("Scan the QR code with your authenticator app, then proceed to verification.");
@@ -58,7 +56,7 @@ const Setup2FA = () => {
   const proceedToVerification = () => {
     navigate("/2fa/verify", { 
       state: { 
-        username: user.username,
+        username: user,
         secret,
         qrCode 
       }
