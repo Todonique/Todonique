@@ -136,7 +136,7 @@ export const getTeamMembersHandler = async (req: Request, res: Response) => {
 
 export const getTeamsForTodoUserHandler = async (req: Request, res: Response) => {
     try{
-        const userId = req.params.userId;
+        const userId = req.params.userId || res.locals.user?.userId;
 
         if(!userId){
             res.status(400).json({error: "Missing userId"});

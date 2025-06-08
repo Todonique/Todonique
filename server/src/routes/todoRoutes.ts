@@ -5,7 +5,8 @@ import { authorize } from '../middleware';
 const router = express.Router();
 
 router.post('/todo', authorize('user'), createTodoHandler);
-router.patch('/todo/:todoId', authorize('user'), updateTodoHandler);
+router.patch('/todo', authorize('user'), updateTodoHandler);
+router.patch('/todo/:todoId', authorize('teamlead'), updateTodoHandler);
 router.get('/todo/:userId/team/:teamId', authorize('user'), getTodosByUserInTeamHandler);
 
 export default router;

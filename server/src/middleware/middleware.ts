@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import sanitize from 'sanitize-html';
 import { config } from '../config';
-import { extractBearerToken, isBlockedLocation } from '../utils';
+import { extractBearerToken, isAllowedLocation } from '../utils';
 import IPinfoWrapper from 'node-ipinfo';
 import jwt from 'jsonwebtoken';
 
@@ -112,18 +112,36 @@ export const authorize = (requiredRole: string) => {
 
 export const locationCheck = (ipinfoWrapper: IPinfoWrapper) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const clientIP = req.ip;
+        if (process.env.NODE_ENV !== 'development') {
+            return next();
+        } else{
+            let clientIP = req.ip;
+            // If localhost, try to get real IP from X-Forwarded-For
+            if (clientIP === '::1' || clientIP === '127.0.0.1') {
+                const forwarded = req.headers['x-forwarded-for'];
+                if (typeof forwarded === 'string') {
+                    clientIP = forwarded.split(',')[0].trim();
+                } else if (Array.isArray(forwarded)) {
+                    clientIP = forwarded[0];
+                }
+            } else {
+                // we assume the ip address is valid here
+            }
+    
             if (!clientIP) {
                 res.status(403).json({ error: 'Access denied from your location' });
             } else {
                 const ipinfo = await ipinfoWrapper.lookupIp(clientIP);
-                if (isBlockedLocation(ipinfo)) {
-                    res.status(403).json({ error: 'Access denied from your location' });
-                } else {
+                if (isAllowedLocation(ipinfo)) {
+                    console.log(`Access granted for IP: ${clientIP}, Location: ${ipinfo.city}, ${ipinfo.country}`);
+                    res.locals.ipinfo = ipinfo;
                     next();
+                } else {
+                    res.status(403).json({ error: 'Access denied from your location' });
                 }
             }
+        }
+        try {
         } catch (error) {
             res.status(403).json({ error: 'Access denied from your location' });
         }
