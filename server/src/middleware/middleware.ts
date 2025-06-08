@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import sanitize from 'sanitize-html';
 import { config } from '../config';
-import { extractBearerToken, isBlockedLocation } from '../utils';
+import { extractBearerToken, isAllowedLocation } from '../utils';
 import IPinfoWrapper from 'node-ipinfo';
 import jwt from 'jsonwebtoken';
 
@@ -79,43 +79,69 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         if (!token) {
             res.status(401).json({ error: 'No token provided' });
         } else{
-            // Implement your token verification logic here
-            // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            // req.user = decoded;
-            next();
+            const decodedToken: jwt.JwtPayload | string = jwt.verify(token, config.jwtSecret);
+            if (typeof decodedToken === 'string' || !decodedToken) {
+                res.status(401).json({ error: 'Invalid token' });
+            } else{
+                res.locals.user = {
+                    userId: decodedToken.userId,
+                    role: decodedToken.role,
+                    username: decodedToken.username
+                };
+                next();
+            }
         }
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
     }
 };
 
-// Authorization middleware
 export const authorize = (requiredRole: string) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        // Implement your role-based authorization logic here
-        // if (req.user.role !== requiredRole) {
-        //     return res.status(403).json({ error: 'Insufficient permissions' });
-        // }
-        next();
+        const user = res.locals.user;
+        if (!user) {
+            res.status(401).json({ error: 'Unauthorized' });
+        } else if (user.role !== requiredRole) {
+            res.status(403).json({ error: 'Insufficient permissions' });
+        } else {
+            res.locals.user = user;
+            next();
+        }
     };
 };
 
-// Location-based security middleware (example)
 export const locationCheck = (ipinfoWrapper: IPinfoWrapper) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const clientIP = req.ip;
+        if (process.env.NODE_ENV !== 'development') {
+            return next();
+        } else{
+            let clientIP = req.ip;
+            // If localhost, try to get real IP from X-Forwarded-For
+            if (clientIP === '::1' || clientIP === '127.0.0.1') {
+                const forwarded = req.headers['x-forwarded-for'];
+                if (typeof forwarded === 'string') {
+                    clientIP = forwarded.split(',')[0].trim();
+                } else if (Array.isArray(forwarded)) {
+                    clientIP = forwarded[0];
+                }
+            } else {
+                // we assume the ip address is valid here
+            }
+    
             if (!clientIP) {
                 res.status(403).json({ error: 'Access denied from your location' });
             } else {
                 const ipinfo = await ipinfoWrapper.lookupIp(clientIP);
-                if (isBlockedLocation(ipinfo)) {
-                    res.status(403).json({ error: 'Access denied from your location' });
-                } else {
-                    // TODO: use ipinfo for other stuff as well
+                if (isAllowedLocation(ipinfo)) {
+                    console.log(`Access granted for IP: ${clientIP}, Location: ${ipinfo.city}, ${ipinfo.country}`);
+                    res.locals.ipinfo = ipinfo;
                     next();
+                } else {
+                    res.status(403).json({ error: 'Access denied from your location' });
                 }
             }
+        }
+        try {
         } catch (error) {
             res.status(403).json({ error: 'Access denied from your location' });
         }

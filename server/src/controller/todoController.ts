@@ -56,7 +56,7 @@ export const updateTodoHandler = async (req: Request, res: Response) => {
 
 export const getTodosByUserInTeamHandler = async (req: Request, res: Response) => {
     try{
-        const userId = req.params.userId;
+        const userId = req.params.userId || res.locals.user?.userId;
         const teamId = req.params.teamId;
         if (!userId || !teamId) {
             res.status(400).json({ error: 'All fields are required' });

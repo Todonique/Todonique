@@ -5,6 +5,7 @@ import qrcode from 'qrcode';
 import { config } from '../config';
 import { Request, Response } from 'express';
 import { CreateUser, UserModel } from '../models/user';
+import { extractBearerToken } from '../utils';
 
 type LoginRequest = {
     username: string;
@@ -43,9 +44,17 @@ export const registerHandler = async (req: Request, res: Response) => {
                 role: newUser.role 
             },
             config.jwtSecret,
-            { expiresIn: '24h' }
+            { expiresIn: '1h' }
         );
-        res.json({ message: 'User registered successfully', data: newUser , jwtToken });
+        const refreshToken = jwt.sign(
+            {
+                userId: newUser.id
+            },
+            config.jwtSecret,
+            { expiresIn: '2h' }
+        );
+
+        res.json({ message: 'User registered successfully', data: newUser , jwtToken, refreshToken });
 
     } catch (error) {
         console.error('Registration error:', error);
@@ -213,12 +222,21 @@ export const loginHandler = async (req: Request, res: Response) => {
                             role: user?.role 
                         },
                         config.jwtSecret,
-                        { expiresIn: '24h' }
+                        { expiresIn: '1h' }
+                    );
+
+                    const refreshToken = jwt.sign(
+                        {
+                            userId: user?.id
+                        },
+                        config.jwtSecret,
+                        { expiresIn: '2h' }
                     );
 
                     res.status(200).json({ 
                         message: 'Login successful',
                         token: jwtToken,
+                        refreshToken,
                         user: {
                             id: user?.id,
                             username: user?.username,
@@ -304,3 +322,57 @@ export const get2FAStatusHandler = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const refreshTokenHandler = async (req: Request, res: Response) => {
+    try {
+        const refreshToken = extractBearerToken(req.headers.authorization);
+
+        if (!refreshToken) {
+            res.status(400).json({ error: 'Refresh token is required' });
+        } else{
+            const decodedToken: jwt.JwtPayload | string = jwt.verify(refreshToken, config.jwtSecret);
+            if (typeof decodedToken === 'string' || !decodedToken) {
+                res.status(401).json({ error: 'Invalid refresh token' });
+            } else {
+                const userId = decodedToken.userId;
+                const user = await UserModel.findById(userId);
+                
+                if (!user) {
+                    res.status(404).json({ error: 'User not found' });
+                } else {
+                    const newJwtToken = jwt.sign(
+                        { 
+                            userId: user.id,
+                            username: user.username,
+                            role: user.role 
+                        },
+                        config.jwtSecret,
+                        { expiresIn: '1h' }
+                    );
+
+                    const newRefreshToken = jwt.sign(
+                        {
+                            userId: user.id
+                        },
+                        config.jwtSecret,
+                        { expiresIn: '2h' }
+                    );
+
+                    res.json({ 
+                        message: 'Token refreshed successfully',
+                        token: newJwtToken,
+                        refreshToken: newRefreshToken,
+                        user: {
+                            id: user.id,
+                            username: user.username,
+                            role: user.role
+                        }
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Refresh token error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}

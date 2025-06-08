@@ -2,7 +2,7 @@ import express from 'express';
 import { todoRoutes, authRoutes, teamRoutes } from './routes';
 import { rateLimiter, securityHeaders, 
     corsMiddleware, requestSizeLimiter, sanitizeInput, 
-    authenticate, authorize, locationCheck } from './middleware';
+    authenticate, locationCheck } from './middleware';
 import IPinfoWrapper from 'node-ipinfo';
 import { config } from './config';
 
@@ -16,8 +16,8 @@ app.use(corsMiddleware);
 app.use(requestSizeLimiter);
 app.use(sanitizeInput);
 
-app.use('/api/todos', authenticate, locationCheck(ipinfoWrapper), todoRoutes);
 app.use('/api/auth', locationCheck(ipinfoWrapper), authRoutes);
+app.use('/api/todos', authenticate, locationCheck(ipinfoWrapper), todoRoutes);
 app.use('/api/teams', authenticate, locationCheck(ipinfoWrapper), teamRoutes);
 
 app.get('/', (_req, res) => {
