@@ -7,7 +7,9 @@ import { config } from "../config";
 
 export const createTodoHandler = async (req: Request, res: Response) => {
     try{
-        const todo: CreateTodo = req.body;
+        let todo: CreateTodo = req.body;
+        const userId = res.locals.user?.userId;
+        todo.created_by = userId;
         if (!todo.title || !todo.description || !todo.assigned_to || !todo.team_id || !todo.created_by) {
             res.status(400).json({ error: 'All fields are required' });
         } else {
