@@ -62,12 +62,16 @@ CREATE TABLE todos (
 CREATE TABLE todo_history (
     todo_history_id SERIAL PRIMARY KEY,
     todo_id INTEGER,
-    updated_at TIMESTAMP,
-    old_assigned_to_value INTEGER,
-    new_assigned_to_value INTEGER,
-    old_status_value INTEGER,
-    new_status_value INTEGER,
-    FOREIGN KEY (todo_id) REFERENCES todos(todo_id)
+    updated_by integer NOT NULL,
+    updated_at timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+    old_title varchar(32),
+    new_title varchar(32),
+    old_description varchar(256),
+    new_description varchar(256),
+    old_assigned_to_value integer,
+    new_assigned_to_value integer,
+    old_status_value integer,
+    new_status_value integer
 );
 
 CREATE TABLE team_invite_status (

@@ -7,6 +7,7 @@ import { config } from '../config';
 export const createTeamHandler = async (req: Request, res: Response) => {
     try{
         const team: CreateTeam = req.body;
+        team.teamLeadId = res.locals.user?.userId;
 
         if(!team) {
             res.status(400).json({ error: 'Team data is required' });

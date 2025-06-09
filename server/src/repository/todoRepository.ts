@@ -1,4 +1,4 @@
-import { CreateTodo, ReadTodo, UpdateTodo } from "../models";
+import { CreateTodo, ReadTodo, TodoHistory, UpdateTodo } from "../models";
 import { pool } from "../config";
 
 export async function createTodo(todo: CreateTodo): Promise<ReadTodo | undefined> {
@@ -171,4 +171,98 @@ export async function getTodoByIdIfInTeam(todoId: number, userId: number): Promi
     `, [todoId, userId]);
 
     return result.rows[0];
+}
+
+export async function getTodoById(todoId: number): Promise<ReadTodo | undefined> {
+    const result = await pool.query<ReadTodo>(`
+        SELECT
+            todos.todo_id,
+            todos.title,
+            todos.description,
+            todo_status.todo_status_name AS status,
+            todos.created_at,
+            todos.assigned_to,
+            users.username AS assigned_name,
+            todos.created_by,
+            creator.username AS created_by_name,
+            todos.team_id,
+            teams.name AS team_name
+        FROM todos
+        JOIN todo_status ON todos.todo_status_id = todo_status.todo_status_id
+        LEFT JOIN users ON todos.assigned_to = users.user_id
+        JOIN users AS creator ON todos.created_by = creator.user_id
+        JOIN teams ON todos.team_id = teams.team_id
+        WHERE todos.todo_id = $1
+        LIMIT 1
+    `, [todoId]);
+
+    return result.rows.length > 0 ? result.rows[0] : undefined;
+}
+
+export async function insertTodoUpdateInHistory(oldTodo: ReadTodo, newTodo: ReadTodo, updatedById: number, updatedByName: string): Promise<void> {
+    await pool.query(`
+        INSERT INTO todo_history (
+            todo_id,
+            updated_by,
+            updated_at,
+            old_title,
+            new_title,
+            old_description,
+            new_description,
+            old_assigned_to_value,
+            new_assigned_to_value,
+            old_status_value,
+            new_status_value
+        )
+        VALUES (
+            $1, 
+            $2,
+            CURRENT_TIMESTAMP, 
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            $8,
+            (SELECT todo_status_id FROM todo_status WHERE todo_status_name = $9),
+            (SELECT todo_status_id FROM todo_status WHERE todo_status_name = $10)
+        )
+    `, [
+        oldTodo.todo_id,
+        updatedById,
+        oldTodo.title,
+        newTodo.title,
+        oldTodo.description,
+        newTodo.description,
+        oldTodo.assigned_to,
+        newTodo.assigned_to,
+        oldTodo.status,
+        newTodo.status
+    ]);
+}
+
+export async function getTodoHistoryByTodoIds(todoIds: number[]): Promise<TodoHistory[]> {
+    const result = await pool.query<TodoHistory>(`
+        SELECT 
+            todo_history_id,
+            todo_id,
+            updated_by,
+            (SELECT username FROM users WHERE user_id = updated_by) AS updated_by_name,
+            updated_at,
+            old_title,
+            new_title,
+            old_description,
+            new_description,
+            old_assigned_to_value AS old_assigned_to,
+            (SELECT username FROM users WHERE user_id = old_assigned_to_value) AS old_assigned_name,
+            new_assigned_to_value AS new_assigned_to,
+            (SELECT username FROM users WHERE user_id = new_assigned_to_value) AS new_assigned_name,
+            (SELECT todo_status_name FROM todo_status WHERE todo_status_id = old_status_value) AS old_status,
+            (SELECT todo_status_name FROM todo_status WHERE todo_status_id = new_status_value) AS new_status
+        FROM todo_history
+        WHERE todo_id = ANY($1)
+        ORDER BY updated_at DESC
+    `, [todoIds]);
+
+    return result.rows;
 }

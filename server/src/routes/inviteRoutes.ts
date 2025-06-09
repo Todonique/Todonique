@@ -4,8 +4,8 @@ import { getUserInvitesHandler, updateInviteStatusHandler, getInviteStatusHandle
 
 const router = express.Router();
 
-router.get('', authorize('user'), getUserInvitesHandler);
-router.post('', authorize('user'), updateInviteStatusHandler);
+router.get('', authorize(['user']), getUserInvitesHandler);
+router.post('', authorize(['user']), updateInviteStatusHandler);
 router.get('/statuses', getInviteStatusHandler);
 
 export default router;
