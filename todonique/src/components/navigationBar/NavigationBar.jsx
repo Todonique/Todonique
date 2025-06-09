@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import "./NavigationBar.css";
 import { HamburgerIcon } from "../hamburgerIcon/HamburgerIcon";
 import { useState } from "react";
+import CtaButton from "../ctaButton.jsx/CtaButton";
 
 export const NavigationBar = () => {
     const userRole = "team-lead"; // "admin", "team-lead", "user"
@@ -31,12 +32,22 @@ export const NavigationBar = () => {
     if (userRole === "team-lead") {
         return (
             <nav className="navbar">
-                <ul className="navbar__list navbar__list--visible">
-                    <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
-                </ul>
-            </nav>
+            <section className="navbar__mobile-header">
+                <Link className="navbar__brand" to="/" onClick={closeMobileNav}>Todonique</Link>
+                <HamburgerIcon isOpen={mobileNavigationOpen} onClick={handleMobileNavToggle} />
+            </section>
+            <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
+                <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
+                 {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Logout</Link></li>}
+            </ul>
+            {!mobileNavigationOpen && (
+                <section className="navbar__logout">
+                    <CtaButton text={"Logout"} />
+                </section>
+            )}
+        </nav>
         );
     }
 
@@ -50,7 +61,6 @@ export const NavigationBar = () => {
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
                 <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
             </ul>
         </nav>
     );

@@ -1,3 +1,3 @@
-export { registerHandler, loginHandler, setupTwoFactorAuthenticationHandler, verifyTwoFactorHandler, refreshTokenHandler } from './authController';
+export { registerHandler, loginHandler, setupTwoFactorHandler, refreshTokenHandler } from './authController';
 export { createTodoHandler, updateTodoHandler, getTodosByUserInTeamHandler, getTodoHistoryByTodoIdsHandler } from './todoController';
 export {createTeamHandler, updateTeamHandler, deleteTeamHandler, getTeamsForTodoUserHandler, insertTeamMemberHandler, getTeamMembersHandler} from './teamController';

@@ -1,5 +1,5 @@
 import express from 'express';
-import { todoRoutes, authRoutes, teamRoutes, roleRoutes, todoReportingRoutes } from './routes';
+import { todoRoutes, authRoutes, teamRoutes, roleRoutes, inviteRoutes, todoReportingRoutes } from './routes';
 import { rateLimiter, securityHeaders, 
     corsMiddleware, requestSizeLimiter, sanitizeInput, 
     authenticate, locationCheck } from './middleware';
@@ -21,6 +21,7 @@ app.use('/api/todos', authenticate, locationCheck(ipinfoWrapper), todoRoutes);
 app.use('/api/teams', authenticate, locationCheck(ipinfoWrapper), teamRoutes);
 app.use('/api/roles', locationCheck(ipinfoWrapper), roleRoutes);
 app.use('/api/history', authenticate, locationCheck(ipinfoWrapper), todoReportingRoutes);
+app.use('/api/invites', authenticate, locationCheck(ipinfoWrapper), inviteRoutes);
 
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');

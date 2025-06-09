@@ -2,10 +2,12 @@
   padding: 2rem;
 }
 
+.dashboard__header {
+  margin-bottom: 2rem;
+}
+
 .dashboard__title {
   font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #003d80;
 }
 
 .dashboard__grid {

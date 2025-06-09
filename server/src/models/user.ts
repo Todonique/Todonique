@@ -29,13 +29,14 @@ export class UserModel {
             const query = `
                 INSERT INTO users (username, password_hash, password_salt, created_at)
                 VALUES ($1, $2, $3, NOW())
-                RETURNING user_id, username, created_at
+                RETURNING user_id as id, username, created_at
             `;
             
             const values = [username, hash, salt];
             const result = await pool.query(query, values);
-            await this.assignUserRole(result.rows[0].user_id, roleId?? 3); 
+            await this.assignUserRole(result.rows[0].id, roleId?? 3); 
             return result.rows[0];
+            
         } catch (error: any) {
             if (error.code === '23505') {
                 if (error.constraint === 'users_username_key') {
@@ -53,7 +54,7 @@ export class UserModel {
     }
 
     static async findByUsername(username: string): Promise<ReadUser | undefined> {
-        const query = 'SELECT u.user_id as id, username, role_name FROM users u  INNER JOIN user_roles ur on ur.user_id = u.user_id inner join roles on roles.id = ur.role_id WHERE username = $1';
+        const query = 'SELECT u.user_id as id, username, role_name as role FROM users u  INNER JOIN user_roles ur on ur.user_id = u.user_id inner join roles on roles.id = ur.role_id WHERE username = $1';
         const result = await pool.query(query, [username]);
         return result.rows[0];
     }
@@ -135,6 +136,7 @@ export class UserModel {
     }
 
     static async assignUserRole(user_id: number, role_id: number) : Promise<void>{
+        console.log(`Assigning role ${role_id} to user ${user_id}`);
         const query = `
             INSERT INTO user_roles (user_id, role_id)
             VALUES ($1, $2)
@@ -165,17 +167,19 @@ export class UserModel {
     }
 
     static async has2FA(userId: number): Promise<boolean> {
+    console.log(`Checking 2FA status for user ${userId}`);
     try {
         const query = `
-            SELECT u.two_fa_secret 
-            FROM users u 
-            WHERE u.user_id = $1
+            SELECT two_fa_secret 
+            FROM users
+            WHERE user_id = $1
         `;
         
         const result = await pool.query(query, [userId]);
+        console.log(`Query result for user ${userId}:`, result.rows);
         
         if (result && result.rows.length > 0) {
-            const twoFactorSecret = result.rows[0].two_factor_secret;
+            const twoFactorSecret = result.rows[0].two_fa_secret;
             return twoFactorSecret !== null && twoFactorSecret !== undefined && twoFactorSecret.trim() !== '';
         }
         
