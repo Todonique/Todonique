@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { config } from '../config';
-import { getAllUsers, getAllTeams, approveTeamLead, updateUserRole } from '../repository/adminRepository';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { getAllUsers, getAllTeams, approveTeamLead, updateUserRole ,resetPassword} from '../repository/adminRepository';
 
 export const getAllUsersHandler = async (_req: Request, res: Response) => {
   try {
@@ -74,6 +76,35 @@ export const updateUserRoleHandler = async (req: Request, res: Response) => {
   } catch (error) {
     if (config.nodeEnv === 'development') {
       console.error('Error updating user role:', error);
+    }
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const resetPasswordHandler = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { user_name, new_password } = req.body;
+
+    if (!user_name || !new_password) {
+      res.status(400).json({ error: 'Username and new password are required' });
+      return;
+    }
+
+    const salt = crypto.randomBytes(16).toString('hex');
+
+    const hashedPassword = await bcrypt.hash(new_password + salt, 12);
+
+    const updated = await resetPassword(user_name, hashedPassword, salt);
+
+    if (!updated) {
+      res.status(404).json({ error: 'User not found or password not updated' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    if (config.nodeEnv === 'development') {
+      console.error('Error resetting password:', error);
     }
     res.status(500).json({ error: 'Internal server error' });
   }
