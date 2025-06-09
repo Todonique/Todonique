@@ -20,8 +20,8 @@ import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
 import LandingPage from "./pages/landingPage/LandingPage";
 import Reporting from "./components/Reporting/Reporting";
 import CreateTeamForm from "./components/CreateTeamForm/CreateTeamForm";
-import AdminRoleManagement from "./pages/admin/AdminRoleManagement";
-import AdminResetPassword from "./pages/admin/AdminResetPassword";
+import AdminRoleManagement from "./pages/admin/Admin";
+import AdminResetPassword from "./pages/admin/Admin";
 
 const router = createBrowserRouter([
   {
