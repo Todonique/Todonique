@@ -23,6 +23,7 @@ export const NavigationBar = () => {
                     <li className="navbar__item"><Link className="navbar__link" to="/admin/reset-password" onClick={closeMobileNav}>Reset Password</Link></li>
                     <li className="navbar__item"><Link className="navbar__link" to="/admin/approve-team-lead" onClick={closeMobileNav}>Approve Team Lead</Link></li>
                     <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
+                    <li className="navbar__item"><Link className="navbar__link" to="admin/roles" onClick={closeMobileNav}>Roles</Link></li>
                 </ul>
             </nav>
         );

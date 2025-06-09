@@ -8,7 +8,6 @@ import Login from "./pages/Login/Login";
 import CreateTodo from "./pages/createTodo/CreateTodo";
 import UpdateTodo from "./pages/updateTodo/UpdateTodo";
 import ReadTodos from "./pages/readTodos/ReadTodos";
-import ResetPassword from "./pages/ResetPassword";
 import ApproveTeamLead from "./pages/ApproveTeamLead";
 import Invites from "./pages/invites/Invites";
 import SetupMFA from "./pages/SetupMFA";
@@ -20,8 +19,8 @@ import ViewSentInvites from "./components/viewSentInvites/viewSentInvites";
 import LandingPage from "./pages/landingPage/LandingPage";
 import Reporting from "./components/Reporting/Reporting";
 import CreateTeamForm from "./components/CreateTeamForm/CreateTeamForm";
-import AdminRoleManagement from "./pages/admin/Admin";
-import AdminResetPassword from "./pages/admin/Admin";
+import Admin from "./pages/admin/Admin";
+import ResetPassword from "./pages/admin/Reset-User-Password";
 
 const router = createBrowserRouter([
   {
@@ -34,15 +33,14 @@ const router = createBrowserRouter([
       { path: "teams/:teamId/todos/:todoId", element: <UpdateTodo /> },
       { path: "teams/:teamId/todos/:todoId/reporting", element: <Reporting /> },
       { path: "teams/create", element: <CreateTeamForm /> },
-      { path: "admin/reset-password", element: <ResetPassword /> },
       { path: "admin/approve-team-lead", element: <ApproveTeamLead /> },
       { path: "invites", element: <Invites /> },
       { path: "invites/send", element: <SendUserInvite /> },
       { path: "invites/sent", element: <ViewSentInvites /> },
       { path: "setup-mfa", element: <SetupMFA /> },
       { path: "landing", element: <LandingPage /> },
-      { path: "admin/roles", element: <AdminRoleManagement /> },
-      { path: "admin/reset-user-password", element: <AdminResetPassword /> },
+      { path: "admin/roles", element: <Admin /> },
+      { path: "admin/reset-password", element: <ResetPassword /> },
       {
         path: "auth",
         element: <AuthLayout />,
