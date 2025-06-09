@@ -3,7 +3,7 @@ import Button from "../../components/button/Button";
 import Message from "../../components/message/Message";
 import Input from "../../components/inputField/Input";
 import AuthNav from "../../components/AuthNav/AuthNav";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, UNSAFE_createClientRoutesWithHMRRevalidationOptOut } from "react-router-dom";
 import "./Login.css";
 import { apiRequest } from "../../utils/api";
 
@@ -89,34 +89,26 @@ const useLogin = () => {
         auth: false
       });
 
-      if (result.requires2FA) {
-        setRequires2FA(true);
-        setUserInfo(result.user);
-        setMessage(result.message || "Please enter your 2FA token to continue.");
-        setMessageType("info");
-      } else {
-        setMessage(result.message || "Login successful! Welcome back.");
-        setMessageType("success");
         
-        if (result.token) {
-          setAuthToken(result.token);
-        }
-        if(result.user.has2FA){
-          navigate("/2fa/verify", { 
-            state: { user: result.user }
-          });
-        } else {
-          navigate("/2fa/setup", { 
-            state: { user: result.user }
-          });
-        }
-        
+      if (result.token) {
+        setAuthToken(result.token);
       }
+
+      if(result.user.has2FA){
+        navigate("/2fa/verify", { 
+          state: { user: result.user }
+        });
+      } else {
+        navigate("/2fa/setup", { 
+          state: { user: result.user }
+        });
+      }
+        
+      
 
     } catch (error) {
       setMessage(error.message || "Login failed. Please try again.");
       setMessageType("error");
-      // Reset 2FA state on error
       setRequires2FA(false);
       setUserInfo(null);
     } finally {
