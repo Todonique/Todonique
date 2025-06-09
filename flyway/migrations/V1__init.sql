@@ -71,7 +71,7 @@ CREATE TABLE todo_history (
     old_assigned_to_value integer,
     new_assigned_to_value integer,
     old_status_value integer,
-    new_status_value integer,
+    new_status_value integer
 );
 
 CREATE TABLE team_invite_status (

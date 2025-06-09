@@ -4,6 +4,6 @@ import { getTodoHistoryByTodoIdsHandler } from '../controller';
 
 const router = express.Router();
 
-router.get('/todo/history', authorize('teamlead'), getTodoHistoryByTodoIdsHandler);
+router.get('/todo/history', authorize(['team_lead']), getTodoHistoryByTodoIdsHandler);
 
 export default router;

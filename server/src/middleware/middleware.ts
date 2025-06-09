@@ -8,10 +8,16 @@ import { extractBearerToken, isAllowedLocation } from '../utils';
 import IPinfoWrapper from 'node-ipinfo';
 import jwt from 'jsonwebtoken';
 
-export const rateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-    message: 'This IP has hit a rate limit, please try again later'
+export const loginRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Too many login attempts from this IP, please try again later'
+});
+
+export const apiRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    message: 'Too many requests from this IP, please try again later'
 });
 
 export const securityHeaders = helmet();
@@ -100,13 +106,13 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const authorize = (requiredRole: string) => {
+export const authorize = (requiredRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         console.log(res.locals.user)
         const user = res.locals.user;
         if (!user) {
             res.status(401).json({ error: 'Unauthorized' });
-        } else if (user.role !== requiredRole) {
+        } else if (!requiredRoles.includes(user.role)) {
             res.status(403).json({ error: 'Insufficient permissions' });
         } else {
             res.locals.user = user;

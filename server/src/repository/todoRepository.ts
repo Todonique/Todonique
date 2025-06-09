@@ -204,48 +204,38 @@ export async function insertTodoUpdateInHistory(oldTodo: ReadTodo, newTodo: Read
         INSERT INTO todo_history (
             todo_id,
             updated_by,
-            updated_by_name,
             updated_at,
             old_title,
             new_title,
             old_description,
             new_description,
-            old_assigned_to,
-            old_assigned_name,
-            new_assigned_to,
-            new_assigned_name,
-            old_status,
-            new_status
+            old_assigned_to_value,
+            new_assigned_to_value,
+            old_status_value,
+            new_status_value
         )
         VALUES (
             $1, 
-            $2, 
-            $3, 
+            $2,
             CURRENT_TIMESTAMP, 
-            $4, 
-            $5, 
-            $6, 
-            $7, 
-            $8, 
-            $9, 
-            $10, 
-            $11, 
-            $12, 
-            $13, 
-            $14
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            $8,
+            (SELECT todo_status_id FROM todo_status WHERE todo_status_name = $9),
+            (SELECT todo_status_id FROM todo_status WHERE todo_status_name = $10)
         )
     `, [
         oldTodo.todo_id,
         updatedById,
-        updatedByName,
         oldTodo.title,
         newTodo.title,
         oldTodo.description,
         newTodo.description,
         oldTodo.assigned_to,
-        oldTodo.assigned_name,
         newTodo.assigned_to,
-        newTodo.assigned_name,
         oldTodo.status,
         newTodo.status
     ]);
@@ -257,18 +247,18 @@ export async function getTodoHistoryByTodoIds(todoIds: number[]): Promise<TodoHi
             todo_history_id,
             todo_id,
             updated_by,
-            updated_by_name,
+            (SELECT username FROM users WHERE user_id = updated_by) AS updated_by_name,
             updated_at,
             old_title,
             new_title,
             old_description,
             new_description,
-            old_assigned_to,
-            old_assigned_name,
-            new_assigned_to,
-            new_assigned_name,
-            old_status,
-            new_status
+            old_assigned_to_value AS old_assigned_to,
+            (SELECT username FROM users WHERE user_id = old_assigned_to_value) AS old_assigned_name,
+            new_assigned_to_value AS new_assigned_to,
+            (SELECT username FROM users WHERE user_id = new_assigned_to_value) AS new_assigned_name,
+            (SELECT todo_status_name FROM todo_status WHERE todo_status_id = old_status_value) AS old_status,
+            (SELECT todo_status_name FROM todo_status WHERE todo_status_id = new_status_value) AS new_status
         FROM todo_history
         WHERE todo_id = ANY($1)
         ORDER BY updated_at DESC
