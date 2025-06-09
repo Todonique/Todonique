@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import { apiRequest } from '../../utils/api';
+import Loader from '../../components/Loader/Loader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTeams();
@@ -16,7 +18,9 @@ const Dashboard = () => {
   };
 
   const fetchTeams = async () => {
+    setLoading(true);
     try {
+      
       const result = await apiRequest(`/teams/teams`, {
         method: 'GET',
         auth: true,
@@ -25,11 +29,13 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching teams:", error);
       // TODO Handle error
+    } finally {
+      setLoading(false);
     };
-    // Loading state
   };
-  
 
+  if (loading) return <Loader />;
+  
   return (
     <main className="dashboard">
       <header className='dashboard__header'>
