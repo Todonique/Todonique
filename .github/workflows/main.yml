@@ -1,30 +1,123 @@
-name: Flyway Migrations
-
+name: "Todonique Deployment Pipeline"
+ 
 on:
-  push:
-    branches:
-      - "kgothatso/feature/ci-cd"
-      - main
-    # paths:
-    #   - 'flyway/**'
-    #   - '.github/workflows/flyway.yml'
-
+    push: 
+        # branches: 
+        #     - main
+ 
 jobs:
-  migrate:
-    runs-on: ubuntu-latest
-    env:
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_URL: ${{ secrets.DB_URL }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Flyway
-        run: |
-          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/9.22.3/flyway-commandline-9.22.3-linux-x64.tar.gz | tar xvz
-          sudo ln -s $PWD/flyway-9.22.3/flyway /usr/local/bin/flyway
-
-      - name: Run Flyway migrations
-        working-directory: flyway
-        run: flyway migrate -configFiles=flyway.conf
+    terraform:
+        name: "Terraform AWS Setup"
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./terraform
+        steps:
+        # Checkout the repository
+        - name: "Checkout Code"
+          uses: actions/checkout@v4
+ 
+        # Set up Terraform
+        - name: "Set up Terraform"
+          uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.5.0
+ 
+        # Initialise Terraform
+        - name: "Terraform Init"
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform init -backend-config="backend.config"
+ 
+        - name: "Create terraform.tfvars"
+          run: |
+            echo 'db_password = "${{ secrets.DB_PASSWORD }}"' > terraform.tfvars
+            echo 'db_username = "${{ secrets.DB_USERNAME }}"' >> terraform.tfvars
+            echo 'db_name = "${{ secrets.DB_NAME }}"' >> terraform.tfvars
+            echo 'backend_bucket = "${{ secrets.BUCKET_NAME }}"' >> terraform.tfvars
+            echo 'backend_key = "${{ secrets.BACKEND_KEY }}"' >> terraform.tfvars
+            echo 'project_name = "${{ secrets.PROJECT_NAME }}"' >> terraform.tfvars
+ 
+        # Validate Terraform configuration
+        - name: "Terraform Validate"
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform validate
+ 
+        # Apply Terraform changes
+        - name: "Terraform Apply"
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform apply -auto-approve
+ 
+    migrate:
+        name: "Run Flyway Migrations"
+        runs-on: ubuntu-latest
+        needs: terraform
+        steps:
+            - name: "Checkout Code"
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+ 
+            - name: "Run Flyway migrations"
+              run: |
+                echo "Running Flyway migrations..."
+                # Print Flyway version
+                docker run --rm flyway/flyway:latest -v
+                echo "Attempting database connection..."
+                docker run --rm \
+                -v $(pwd):/flyway/sql \
+                flyway/flyway:latest \
+                -url=jdbc:postgresql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+                -user=${{ secrets.DB_USERNAME }} \
+                -password=${{ secrets.DB_PASSWORD }} \
+                -connectRetries=3 \
+                -connectRetriesInterval=10 \
+                info
+ 
+                echo "Running migrations..."
+                docker run --rm \
+                -v $(pwd):/flyway/sql \
+                flyway/flyway:latest \
+                -url=jdbc:postgresql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+                -user=${{ secrets.DB_USERNAME }} \
+                -password=${{ secrets.DB_PASSWORD }} \
+                -connectRetries=3 \
+                -connectRetriesInterval=10 \
+                -locations=filesystem:/flyway/migrations \
+                migrate
+ 
+    deploy:
+      name: "Deploy to EC2"
+      runs-on: ubuntu-latest
+      needs: migrate
+      steps:
+        - name: "Checkout Code"
+          uses: actions/checkout@v4
+ 
+        - name: "Deploy to EC2 via SSH"
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ubuntu
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+              cd /home/ubuntu/todonique-app
+              npm install ts-node
+              cat > .env << EOF
+              PGHOST=${{ secrets.DB_HOST }}
+              PGUSER=${{ secrets.DB_USERNAME }}
+              PGDATABASE=${{ secrets.DB_NAME }}
+              PGPASSWORD=${{ secrets.DB_PASSWORD }}
+              PGPORT=${{ secrets.DB_PORT }}
+              PORT=${{ secrets.PORT }}
+              NODE_ENV=development
+              EOF
+              git pull origin ${{ github.ref_name }}
+              npm install
+              npm run build
+              pm2 restart todonique-app || pm2 start dist/app.js --name "todonique-app"
