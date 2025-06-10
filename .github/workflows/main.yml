@@ -121,4 +121,4 @@ jobs:
               cd server
               npm install
               npm run build
-              pm2 restart todonique-app || pm2 start dist/app.js --name "todonique-app"
+              pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
