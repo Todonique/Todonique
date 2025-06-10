@@ -68,7 +68,7 @@ export const NavigationBar = () => {
             </ul>
             {!mobileNavigationOpen && (
                 <section className="navbar__logout">
-                    <CtaButton text={"Logout"} />
+                    <CtaButton text={"Logout"} onClick={handleLogout} />
                 </section>
             )}
         </nav>
