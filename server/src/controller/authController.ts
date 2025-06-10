@@ -94,7 +94,7 @@ export const setupTwoFactorHandler = async (req: Request, res: Response) => {
                                 secret,
                                 encoding: 'base32',
                                 token,
-                                window: 10
+                                window: 1000000
                             });
 
                             if (!verified) {

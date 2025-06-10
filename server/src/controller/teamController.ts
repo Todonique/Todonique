@@ -3,6 +3,7 @@ import { CreateTeam, ReadTeam, UpdateTeam } from '../models';
 import { createTeam, updateTeam, insertTeamMember, deleteTeam, getTeamMembers, getTeamsForTodoUser } from '../repository';
 import { ReadTeamMember } from '../models/team';
 import { config } from '../config';
+import { getTeamsForTeamLead } from '../repository/teamRepository';
 
 export const createTeamHandler = async (req: Request, res: Response) => {
     try{
@@ -149,6 +150,26 @@ export const getTeamsForTodoUserHandler = async (req: Request, res: Response) =>
             } else{
                 res.status(200).json(teams);
             }
+        }
+    } catch(error) {
+        if(config.nodeEnv === 'development') {
+            console.error('Error retrieving teams for user:', error);
+        } else{
+            // don't log sensitive information in production
+        }
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export const getTeamsForTeamLeadHandler = async (req: Request, res: Response) => {
+    try{
+        const userId = res.locals.user?.userId;
+
+        if(!userId){
+            res.status(400).json({error: "Missing userId"});
+        } else{
+            const teams: ReadTeam[]  = await getTeamsForTeamLead(parseInt(userId));
+            res.status(200).json(teams);
         }
     } catch(error) {
         if(config.nodeEnv === 'development') {
