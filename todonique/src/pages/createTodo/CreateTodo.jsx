@@ -18,13 +18,11 @@ export default function CreateTodo() {
   const [teamMembers, setTeamMembers] = useState([]);
 
   const fetchTeamMembers = async () => {
-  console.log("Fetching team members for teamId:", teamId);
     const result = await apiRequest(`/teams/team/${teamId}/members`, {
       method: "GET",
       auth: true,
     });
     setTeamMembers(result);
-    console.log("Fetched team members:", result);
   };
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:45000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -47,7 +47,6 @@ export async function apiRequest(endpoint, {
 
     return data;
   } catch (error) {
-    console.log(body)
     console.error("API request error:", error);
     throw error;
   }

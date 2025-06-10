@@ -85,10 +85,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         if (!token) {
             res.status(401).json({ error: 'No token provided' });
         } else{
-            console.log('Token provided:', token);
-            console.log('JWT Secret:', config.jwtSecret);
             const decodedToken: jwt.JwtPayload | string = jwt.verify(token, config.jwtSecret);
-            console.log("decodedToken-",decodedToken);
             if (typeof decodedToken === 'string' || !decodedToken) {
                 res.status(401).json({ error: 'Invalid token' });
             } else{
@@ -108,7 +105,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
 export const authorize = (requiredRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        console.log(res.locals.user)
         const user = res.locals.user;
         if (!user) {
             res.status(401).json({ error: 'Unauthorized' });
