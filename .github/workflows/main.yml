@@ -118,6 +118,7 @@ jobs:
               NODE_ENV=development
               EOF
               git pull origin ${{ github.ref_name }}
+              cd server
               npm install
               npm run build
               pm2 restart todonique-app || pm2 start dist/app.js --name "todonique-app"
