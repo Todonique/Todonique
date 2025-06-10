@@ -8,8 +8,8 @@ export type Invite = {
   invited_user_id: number;
   invited_by: number;
   statusId: number;
-  status: string; // Use `statusName` for clarity
-  created_at: Date;       // Use `Date` if parsing to Date object
+  status: string; 
+  created_at: Date;  
   responded_at: string | null;
 };
 
