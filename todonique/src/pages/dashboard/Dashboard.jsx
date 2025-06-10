@@ -20,7 +20,6 @@ const Dashboard = () => {
   const fetchTeams = async () => {
     setLoading(true);
     try {
-      
       const result = await apiRequest(`/teams/teams`, {
         method: 'GET',
         auth: true,
