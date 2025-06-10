@@ -36,3 +36,13 @@ export const getInviteStatusHandler = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }   
 };
+
+export const sendInviteHandler = async (req: Request, res: Response) => {
+    try{
+        const {teamId, invitedeUserId, senderId } = req.body;
+        await InviteModel.sendTeamInvite(teamId,invitedeUserId,senderId);
+        res.status(200).send();
+    } catch(error) {
+        res.status(500).json({error: 'Internal Server Error'})
+    }
+}
