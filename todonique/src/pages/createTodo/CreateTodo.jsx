@@ -57,7 +57,7 @@ export default function CreateTodo() {
           body: requestBody,
           auth: true,
         });
-        toast.success('Successfuly updated todo.', {
+        toast.success('Successfuly created todo.', {
           position: "bottom-right",
           autoClose: 4000,
           closeOnClick: true,

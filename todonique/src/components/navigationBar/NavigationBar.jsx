@@ -62,7 +62,7 @@ export const NavigationBar = () => {
             </section>
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
                 <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/invites/send" onClick={closeMobileNav}>Send Invite</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
                  {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" onClick={handleLogout}>Logout</Link></li>}
             </ul>
