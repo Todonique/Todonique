@@ -59,6 +59,15 @@ export class UserModel {
         return result.rows[0];
     }
 
+    static async findUsersBySearch(searchText: string): Promise<ReadUser[]> {
+        const query = `SELECT u.user_id as id, username, role_name as role FROM users u  
+            INNER JOIN user_roles ur on ur.user_id = u.user_id 
+            inner join roles on roles.id = ur.role_id WHERE username LIKE $1 AND role_id = 3 
+        `
+        const result = await pool.query(query, [`%${searchText}%`]);
+        return result.rows;
+    }
+
     static async findByUsernameWithAuth(username: string): Promise<TodoUser | undefined> {
         const query = `SELECT u.user_id as id, username, password_hash as hash, password_salt, role_name as role
             FROM users u 
@@ -136,7 +145,6 @@ export class UserModel {
     }
 
     static async assignUserRole(user_id: number, role_id: number) : Promise<void>{
-        console.log(`Assigning role ${role_id} to user ${user_id}`);
         const query = `
             INSERT INTO user_roles (user_id, role_id)
             VALUES ($1, $2)
@@ -167,7 +175,6 @@ export class UserModel {
     }
 
     static async has2FA(userId: number): Promise<boolean> {
-    console.log(`Checking 2FA status for user ${userId}`);
     try {
         const query = `
             SELECT two_fa_secret 
@@ -176,7 +183,6 @@ export class UserModel {
         `;
         
         const result = await pool.query(query, [userId]);
-        console.log(`Query result for user ${userId}:`, result.rows);
         
         if (result && result.rows.length > 0) {
             const twoFactorSecret = result.rows[0].two_fa_secret;

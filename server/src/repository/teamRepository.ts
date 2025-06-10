@@ -151,3 +151,15 @@ export const getTeamsForTodoUser = async (userId: number): Promise<ReadTeam[] | 
 
     return teams.rows.length > 0 ? teams.rows : undefined;
 };
+
+export const getTeamsForTeamLead = async (userId: number): Promise<ReadTeam[]> => {
+    const teams = await pool.query(`
+        SELECT 
+            team_id as "teamId",
+            name,
+            team_lead_id as "teamLeadId"
+            from teams
+		    where team_lead_id = $1
+    `, [userId]);
+    return teams.rows;
+};

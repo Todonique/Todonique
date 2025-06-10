@@ -14,17 +14,14 @@ export default function UpdateTodo() {
   const [edit, setEdit] = useState(false);
 
   const fetchTeamMemebers = async () => {
-  console.log("Fetching team members for teamId:", teamId);
     const result = await apiRequest(`/teams/team/${teamId}/members`, {
       method: "GET",
       auth: true,
     });
     setTeamMembers(result);
-    console.log("Fetched team members:", result);
   };
 
   const fetchTodo = async () => {
-   console.log("Fetching todo with teamId:", teamId, "and todoId:", todoId);
     const result = await apiRequest(`/todos/todo/${todoId}`,
       {
         method: "GET",
@@ -32,7 +29,6 @@ export default function UpdateTodo() {
       }
     );
     setForm(result);
-    console.log("Fetched team members:", result);
   };
 
 

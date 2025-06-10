@@ -15,7 +15,6 @@ export type Invite = {
 
 export class InviteModel {
   static async getInvites(userId: number): Promise<Invite[]> {
-    console.log('Fetching invites for user bruuuh:', userId);
     const query = `
       SELECT 
         ti.id, 
@@ -38,7 +37,6 @@ export class InviteModel {
   }
 
   static async updateInviteStatus(inviteId: number, status: number): Promise<void> {
-    console.log(`Updating invite status for invite ID ${inviteId} to status ${status}`);
     const query = `
       UPDATE team_invites 
       SET status = $1, responded_at = CURRENT_DATE
