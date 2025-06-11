@@ -97,14 +97,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Go to the application directory
+            # Navigate to app
             cd /home/ubuntu/todonique-app
-            
-            # Reset any local changes to prevent git conflicts
+
+            # Reset changes and pull latest
             git reset --hard HEAD
             git pull origin main
-            
-            # **FIX 1: Create the .env file with the correct variable names**
+
+            # Create .env file
             cat > .env << EOF
             DB_HOST=${{ secrets.DB_HOST }}
             DB_USER=${{ secrets.DB_USERNAME }}
@@ -113,42 +113,50 @@ jobs:
             DB_PORT=${{ secrets.DB_PORT }}
             PORT=${{ secrets.PORT }}
             NODE_ENV=production
-            # Add other required variables like JWT_SECRET here
-            JWT_SECRET=${{ secrets.JWT_SECRET }} 
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
-            
-            # Install dependencies and build the app
+
+            # Build server
             cd server
             npm install
             npm run build
-            
-            # Restart the application with PM2
-            cd .. 
+
+            # Restart app with PM2
+            cd ..
             pm2 restart todonique-app || pm2 start server/dist/server.js --name "todonique-app"
-            
-            # **FIX 2: Configure Nginx with corrected SSL paths**
+
+            # Set domain variable
+            DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
+            if [ -z "$DOMAIN_NAME" ]; then
+              echo "DOMAIN_NAME is empty. Aborting nginx config."
+              exit 1
+            fi
+
+            # Update nginx config safely
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
             server {
                 listen 80;
-                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+                server_name $DOMAIN_NAME www.$DOMAIN_NAME;
                 return 301 https://\$host\$request_uri;
             }
             server {
                 listen 443 ssl http2;
-                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
-                ssl_certificate /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/fullchain.pem;
-                ssl_certificate_key /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/privkey.pem;
-                location / {
-                    proxy_pass http://localhost:${{ secrets.PORT }};
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection 'upgrade';
-                    proxy_set_header Host \$host;
-                    proxy_cache_bypass \$http_upgrade;
-                }
+                server_name $DOMAIN_NAME www.$DOMAIN_NAME;
+
+                ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+                ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+
+              location / {
+                  proxy_pass http://localhost:${{ secrets.PORT }};
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade \$http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host \$host;
+                  proxy_cache_bypass \$http_upgrade;
+              }
             }
             EOF
-            
-            # Test and restart Nginx
+
+            # Test and restart nginx
             sudo nginx -t
             sudo systemctl restart nginx
