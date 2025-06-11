@@ -11,7 +11,6 @@ const Setup2FA = () => {
   const location = useLocation();
   
   const user = location.state?.user || location.state?.username || undefined;
-  console.log("User in Setup2FA:", user);
 
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
@@ -89,8 +88,6 @@ const Setup2FA = () => {
       setMessageType("success");
       
       setTimeout(() => {
-        console.log(user)
-
         
         navigate("/", { 
           state: { user: "Registration and 2FA setup complete! Please log in." }

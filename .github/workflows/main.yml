@@ -1,28 +1,151 @@
-name: Flyway Migrations
+name: "Todonique Deployment Pipeline"
 
 on:
   push:
-    branches: [kgothatso/feature/ci-cd, main]
-    paths:
-      - 'flyway/**'
-      - '.github/workflows/flyway.yml'
+    branches:
+      - main
 
 jobs:
-  migrate:
+  terraform:
+    name: "Terraform AWS Setup"
     runs-on: ubuntu-latest
-    env:
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_URL: ${{ secrets.DB_URL }}
-
+    defaults:
+      run:
+        working-directory: ./terraform
     steps:
-      - uses: actions/checkout@v4
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
 
-      - name: Install Flyway
+      - name: "Set up Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: "Terraform Init"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform init -backend-config="backend.config"
+
+      - name: "Create terraform.tfvars"
         run: |
-          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/9.22.3/flyway-commandline-9.22.3-linux-x64.tar.gz | tar xvz
-          sudo ln -s $PWD/flyway-9.22.3/flyway /usr/local/bin/flyway
+          echo 'db_password = "${{ secrets.DB_PASSWORD }}"' > terraform.tfvars
+          echo 'db_username = "${{ secrets.DB_USERNAME }}"' >> terraform.tfvars
+          echo 'db_name = "${{ secrets.DB_NAME }}"' >> terraform.tfvars
+          echo 'backend_bucket = "${{ secrets.BUCKET_NAME }}"' >> terraform.tfvars
+          echo 'backend_key = "${{ secrets.BACKEND_KEY }}"' >> terraform.tfvars
+          echo 'project_name = "${{ secrets.PROJECT_NAME }}"' >> terraform.tfvars
 
-      - name: Run Flyway migrations
-        working-directory: flyway
-        run: flyway migrate -configFiles=flyway.conf
+      - name: "Terraform Validate"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform validate
+
+      - name: "Terraform Apply"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply -auto-approve
+
+  migrate:
+    name: "Run Flyway Migrations"
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Run Flyway migrations"
+        run: |
+          echo "Running Flyway migrations..."
+          docker run --rm flyway/flyway:latest -v
+          echo "Attempting database connection..."
+          docker run --rm \
+            -v $(pwd):/flyway/sql \
+            flyway/flyway:latest \
+            -url=jdbc:postgresql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+            -user=${{ secrets.DB_USERNAME }} \
+            -password=${{ secrets.DB_PASSWORD }} \
+            -connectRetries=3 \
+            -connectRetriesInterval=10 \
+            info
+          echo "Running migrations..."
+          docker run --rm \
+            -v $(pwd):/flyway/sql \
+            flyway/flyway:latest \
+            -url=jdbc:postgresql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }} \
+            -user=${{ secrets.DB_USERNAME }} \
+            -password=${{ secrets.DB_PASSWORD }} \
+            -connectRetries=3 \
+            -connectRetriesInterval=10 \
+            -locations=filesystem:/flyway/sql/flyway/migrations \
+            migrate
+
+  deploy:
+    name: "Deploy and Diagnose"
+    runs-on: ubuntu-latest
+    needs: migrate
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Deploy, Configure, and Get SSL"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo apt-get update
+            sudo apt-get install -y nginx
+            cd /home/ubuntu/todonique-app
+            cat > .env << EOF
+            PGHOST=${{ secrets.DB_HOST }}
+            PGUSER=${{ secrets.DB_USERNAME }}
+            PGDATABASE=${{ secrets.DB_NAME }}
+            PGPASSWORD=${{ secrets.DB_PASSWORD }}
+            PGPORT=${{ secrets.DB_PORT }}
+            PORT=${{ secrets.PORT }}
+            NODE_ENV=production
+            EOF
+            git pull origin ${{ github.ref_name }}
+            cd server
+            npm install
+            npm run build
+            pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
+            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+            server {
+                listen 80;
+                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+                return 301 https://\$host\$request_uri;
+            }
+            server {
+                listen 443 ssl http2;
+                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+                ssl_certificate /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/fullchain.pem;
+                ssl_certificate_key /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/privkey.pem;
+                location / {
+                    proxy_pass http://localhost:${{ secrets.PORT }};
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
+            }
+            EOF
+            
+            sudo nginx -t
+            sudo systemctl restart nginx
+            
+            echo "--- RUNNING DIAGNOSTICS ---"
+            sleep 5
+            echo "--- PM2 STATUS ---"
+            pm2 list
+            echo "--- APPLICATION LOGS (LAST 100 LINES) ---"
+            pm2 logs todonique-app --lines 100 --nostream
+            echo "--- NGINX ERROR LOGS (LAST 50 LINES) ---"
+            sudo tail -n 50 /var/log/nginx/error.log

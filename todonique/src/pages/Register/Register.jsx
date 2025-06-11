@@ -146,7 +146,6 @@ const useRegister = () => {
 
       setMessage("Registration successful! Welcome to our platform.");
       setMessageType("success");
-      console.log("Registration result:", result);
       if (result.jwtToken) {
         setAuthToken(result.jwtToken);
       }

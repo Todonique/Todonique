@@ -3,12 +3,10 @@ import { InviteModel } from '../models/invite';
 
 export const getUserInvitesHandler = async (req: Request, res: Response) => {
     try {
-        console.log('Fetching invites for user:', res.locals.user);
         const userId = res.locals.user.userId;
         const invites = await InviteModel.getInvites(userId);
         res.status(200).json(invites);
     } catch (error) {
-        console.log(res.locals.user)
         console.error('Error fetching invites:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -17,7 +15,6 @@ export const getUserInvitesHandler = async (req: Request, res: Response) => {
 export const updateInviteStatusHandler = async (req: Request, res: Response) => {
     try {
         const {id,status} = req.body;
-        console.log(req.body)
         await InviteModel.updateInviteStatus(id, status);
         res.status(200).send();
     } catch (error) {
@@ -39,7 +36,8 @@ export const getInviteStatusHandler = async (req: Request, res: Response) => {
 
 export const sendInviteHandler = async (req: Request, res: Response) => {
     try{
-        const {teamId, invitedeUserId, senderId } = req.body;
+        const senderId = res.locals.user?.userId
+        const {teamId, invitedeUserId } = req.body;
         await InviteModel.sendTeamInvite(teamId,invitedeUserId,senderId);
         res.status(200).send();
     } catch(error) {

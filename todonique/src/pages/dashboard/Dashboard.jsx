@@ -26,8 +26,9 @@ const Dashboard = () => {
       });
       setTeams(result);
     } catch (error) {
-      console.error("Error fetching teams:", error);
-      // TODO Handle error
+      if (error.message === "Unauthorized") {
+        navigate("/auth/login");
+      }
     } finally {
       setLoading(false);
     };

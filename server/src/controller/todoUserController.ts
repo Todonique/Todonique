@@ -1,5 +1,6 @@
 import { AdminUpdateUser, ReadUser } from "../models";
 import { Request, Response } from 'express';
+import { UserModel } from "../models/user";
 
 export const getTodoUserHandler = async (req: Request, res: Response) => {
     try{
@@ -16,6 +17,16 @@ export const getTodoUserHandler = async (req: Request, res: Response) => {
             }
         }
     } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export const findUsersBySearchHandler = async (req: Request, res: Response) => {
+    try {
+        const searchText = req.params.searchText;
+        const users = await UserModel.findUsersBySearch(searchText);
+        res.status(200).json(users);
+    } catch(error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
