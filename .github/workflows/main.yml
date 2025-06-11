@@ -106,6 +106,7 @@ jobs:
 
             # Create .env file
             cat > .env << EOF
+            BASE_URL=${{ secrets.BASE_URL }}
             DB_HOST=${{ secrets.DB_HOST }}
             DB_USER=${{ secrets.DB_USERNAME }}
             DB_NAME=${{ secrets.DB_NAME }}
