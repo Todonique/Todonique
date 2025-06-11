@@ -1,7 +1,7 @@
 import app from './app';
 import { config } from './config';
 
-app.listen(config.port, () => {
+app.listen(config.port, "0.0.0.0", () => {
     if (config.nodeEnv === 'production') {
         console.log(`🚀 Server running on ${config.baseURL}`);
     } else {
