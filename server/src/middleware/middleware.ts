@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 
 export const loginRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 50,
     message: 'Too many login attempts from this IP, please try again later'
 });
 
