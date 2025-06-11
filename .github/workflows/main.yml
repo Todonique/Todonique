@@ -103,13 +103,19 @@ jobs:
             sudo apt-get install -y nginx
             cd /home/ubuntu/todonique-app
             cat > .env << EOF
-            PGHOST=${{ secrets.DB_HOST }}
-            PGUSER=${{ secrets.DB_USERNAME }}
-            PGDATABASE=${{ secrets.DB_NAME }}
-            PGPASSWORD=${{ secrets.DB_PASSWORD }}
-            PGPORT=${{ secrets.DB_PORT }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USERNAME }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
             PORT=${{ secrets.PORT }}
-            NODE_ENV=production
+            NODE_ENV={{ secrets.NODE_ENV }}
+            ALLOWED_ORIGINS={{ secrets.ALLOWED_ORIGINS }}
+            MAX_REQUEST_SIZE={{ secrets.MAX_REQUEST_SIZE }}
+            IPINFO_TOKEN={{ secrets.IPINFO_TOKEN }}
+            ALLOWED_CITIES={{ secrets.ALLOWED_CITIES }}
+            JWT_SECRET={{ secrets.JWT_SECRET }}
+            PORT={{ secrets.PORT }}
             EOF
             git pull origin ${{ github.ref_name }}
             cd server
