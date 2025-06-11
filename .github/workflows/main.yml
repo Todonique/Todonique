@@ -92,7 +92,7 @@ jobs:
                 migrate
  
     deploy:
-       name: "Deploy and Diagnose" # I've updated the name for clarity
+       name: "Deploy and Diagnose"
        runs-on: ubuntu-latest
        needs: migrate
        steps:
@@ -106,9 +106,8 @@ jobs:
              username: ubuntu
              key: ${{ secrets.EC2_SSH_KEY }}
              script: |
-               # --- This part is the same as before ---
                sudo apt-get update
-               sudo apt-get install -y nginx python3-certbot-nginx
+               sudo apt-get install -y nginx
                cd /home/ubuntu/todonique-app
                cat > .env << EOF
                PGHOST=${{ secrets.DB_HOST }}
@@ -124,6 +123,7 @@ jobs:
                npm install
                npm run build
                pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
+
                sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
                server {
                    listen 80;
@@ -145,26 +145,18 @@ jobs:
                    }
                }
                EOF
+               
                sudo nginx -t
                sudo systemctl restart nginx
                
                echo "--- RUNNING DIAGNOSTICS ---"
-               
-               # Give the app a few seconds to potentially crash
                sleep 5
-               
-               # Check the status of the app in PM2
                echo "--- PM2 STATUS ---"
                pm2 list
-               
-               # Check what's listening on the network. Is our app on the correct port?
-               echo "--- NETWORK LISTENERS ---"
-               sudo lsof -i -P -n | grep LISTEN
-               
-               # Show the last 100 lines of the application log. The error will be here.
                echo "--- APPLICATION LOGS (LAST 100 LINES) ---"
                pm2 logs todonique-app --lines 100 --nostream
-               
-               # Show the last 50 lines of the Nginx error log
                echo "--- NGINX ERROR LOGS (LAST 50 LINES) ---"
                sudo tail -n 50 /var/log/nginx/error.log
+
+                  echo "--- NGINX ERROR LOGS (LAST 50 LINES) ---"
+                  sudo tail -n 50 /var/log/nginx/error.log
