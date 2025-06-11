@@ -164,4 +164,3 @@ jobs:
 
               # Auto-renew setup
               echo "0 3 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab
-              
