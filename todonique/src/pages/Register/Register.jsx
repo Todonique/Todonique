@@ -63,19 +63,11 @@ const useRegister = () => {
   const hasLowerCase = (password) => /[a-z]/.test(password);
   const hasSpecialChar = (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
   const hasNumber = (password) => /\d/.test(password);
-  const isNotCommon = (password) => {
-    const commonPasswords = [
-      'password', '123456', '123456789', 'qwerty', 'abc123', 
-      'password123', 'admin', 'letmein', 'welcome', '123123'
-    ];
-    return !commonPasswords.includes(password.toLowerCase());
-  };
 
   const isPasswordValid = (password) => {
     return hasMinLength(password) && 
            hasUpperCase(password) && 
-           hasSpecialChar(password) &&
-           isNotCommon(password);
+           hasSpecialChar(password);
   };
 
   const handleChange = (e) => {
@@ -186,7 +178,6 @@ const useRegister = () => {
       hasLowerCase: hasLowerCase(form.password),
       hasSpecialChar: hasSpecialChar(form.password),
       hasNumber: hasNumber(form.password),
-      isNotCommon: isNotCommon(form.password),
       isValid: isPasswordValid(form.password)
     }
   };
@@ -291,9 +282,6 @@ const Register = () => {
                 </PasswordRequirement>
                 <PasswordRequirement met={passwordValidation.hasNumber}>
                   Have at least one number
-                </PasswordRequirement>
-                <PasswordRequirement met={passwordValidation.isNotCommon}>
-                  Not be a common password
                 </PasswordRequirement>
               </aside>
             )}
