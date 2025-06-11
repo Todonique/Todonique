@@ -86,25 +86,74 @@ jobs:
             migrate
 
   deploy:
+    name: "Deploy and Diagnose"
     runs-on: ubuntu-latest
- 
+    needs: migrate
     steps:
-      deploy:
-    runs-on: ubuntu-latest
- 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
- 
-      - name: Install Vercel CLI
-        run: npm install --global vercel
- 
-      - name: Deploy to Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-          vercel build --prod --token=$VERCEL_TOKEN
-          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Deploy, Configure, and Get SSL"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            trap 'echo "Deployment failed. Showing PM2 logs..."; pm2 logs todonique-app --lines 100 --nostream' ERR
+            sudo apt-get update
+            sudo apt-get install -y nginx
+            cd /home/ubuntu/todonique-app
+            cat > .env << EOF
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USERNAME }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            PORT=${{ secrets.PORT }}
+            NODE_ENV=${{ secrets.NODE_ENV }}
+            ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
+            MAX_REQUEST_SIZE=${{ secrets.MAX_REQUEST_SIZE }}
+            IPINFO_TOKEN=${{ secrets.IPINFO_TOKEN }}
+            ALLOWED_CITIES=${{ secrets.ALLOWED_CITIES }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            EOF
+            git pull origin ${{ github.ref_name }}
+            cd server
+            npm install
+            npm run build
+            pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
+            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+            server {
+                listen 80;
+                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+                return 301 https://\$host\$request_uri;
+            }
+            server {
+                listen 443 ssl http2;
+                server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+                ssl_certificate /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/fullchain.pem;
+                ssl_certificate_key /etc/letsencrypt/live/${{ secrets.DOMAIN_NAME }}/privkey.pem;
+                location / {
+                    proxy_pass http://localhost:${{ secrets.PORT }};
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
+            }
+            EOF
+            
+            sudo nginx -t
+            sudo systemctl restart nginx
+            
+            echo "--- RUNNING DIAGNOSTICS ---"
+            sleep 5
+            echo "--- PM2 STATUS ---"
+            pm2 list
+            echo "--- APPLICATION LOGS (LAST 100 LINES) ---"
+            pm2 logs todonique-app --lines 100 --nostream
+            echo "--- NGINX ERROR LOGS (LAST 50 LINES) ---"
+            sudo tail -n 50 /var/log/nginx/error.log
