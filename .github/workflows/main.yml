@@ -105,6 +105,9 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y nginx
             cd /home/ubuntu/todonique-app
+            cd server
+            npm install
+            npm run build
             cat > dist/.env << EOF
             DB_HOST=${{ secrets.DB_HOST }}
             DB_USER=${{ secrets.DB_USERNAME }}
@@ -120,9 +123,6 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
             git pull origin ${{ github.ref_name }}
-            cd server
-            npm install
-            npm run build
             pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
             server {
