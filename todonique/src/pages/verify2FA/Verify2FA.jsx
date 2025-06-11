@@ -10,19 +10,18 @@ const Verify2FA = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const { username, secret, qrCode } = location.state || {};
+  const { user } = location.state || {};
 
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if no required data provided
   useEffect(() => {
-    if (!username || !secret) {
+    if (!user) {
       navigate("/auth/register");
     }
-  }, [username, secret, navigate]);
+  }, [user, navigate]);
 
   const verify2FA = async (e) => {
     e.preventDefault();
@@ -46,9 +45,7 @@ const Verify2FA = () => {
       await apiRequest('/auth/verify-2fa', {
         method: 'POST',
         body: {
-          username,
           token: token.trim(),
-          secret
         },
         auth: true 
       });
@@ -71,11 +68,9 @@ const Verify2FA = () => {
   };
 
   const handleTokenChange = (e) => {
-    // Only allow numbers and limit to 6 digits
     const value = e.target.value.replace(/\D/g, '').slice(0, 6);
     setToken(value);
     
-    // Clear message when user starts typing
     if (message && messageType === "error") {
       setMessage("");
     }
@@ -86,10 +81,6 @@ const Verify2FA = () => {
       state: { username }
     });
   };
-
-  if (!username || !secret) {
-    return null; // Will redirect via useEffect
-  }
 
   return (
     <div className="setup-2fa-container">
@@ -105,7 +96,7 @@ const Verify2FA = () => {
         
         <div className="setup-2fa-card">
           <div className="verify-step">
-            {qrCode && (
+  
               <div className="qr-reminder">
                 <p><strong>Reminder:</strong> Make sure you've scanned the QR code with your authenticator app.</p>
                 <button 
@@ -117,7 +108,7 @@ const Verify2FA = () => {
                   ← Back to QR Code
                 </button>
               </div>
-            )}
+            
 
             <div className="verify-section">
               <h3>Step 2: Verify Setup</h3>

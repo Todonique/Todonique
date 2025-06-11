@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../../components/button/Button";
 import Message from "../../components/message/Message";
+import Input from "../../components/inputField/Input";
 import { apiRequest } from "../../utils/api";
 import "./Setup2FA.css";
 
@@ -9,43 +10,43 @@ const Setup2FA = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const user = location.state?.user;
-  console.log("Username from location state:", user.username);
+  const user = location.state?.user || location.state?.username || undefined;
 
   const [qrCode, setQrCode] = useState("");
   const [secret, setSecret] = useState("");
+  const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialSetup, setIsInitialSetup] = useState(true);
 
   useEffect(() => {
-    console.log("Username from state:", user);
     if (!user) {
       navigate("/auth/register");
     }
   }, [user, navigate]);
 
-  // Auto-setup 2FA when component mounts
   useEffect(() => {
     if (user) {
-      setup2FA();
+      generateQRCode();
     }
   }, [user]);
 
-  const setup2FA = async () => {
+  const generateQRCode = async () => {
     setIsLoading(true);
     setMessage("");
 
     try {
       const result = await apiRequest('/auth/setup-2fa', {
         method: 'POST',
-        body: { username: user.username },
+        body: { username: user.username || user },
       });
 
       setQrCode(result.qrCode);
       setSecret(result.secret);
-      setMessage("Scan the QR code with your authenticator app, then proceed to verification.");
+      setMessage("Scan the QR code with your authenticator app, then enter the verification code below.");
       setMessageType("info");
+      setIsInitialSetup(false);
 
     } catch (error) {
       setMessage(error.message);
@@ -55,20 +56,61 @@ const Setup2FA = () => {
     }
   };
 
-  const proceedToVerification = () => {
-    navigate("/2fa/verify", { 
-      state: { 
-        username: user.username,
-        secret,
-        qrCode 
-      }
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!token.trim()) {
+      setMessage("Please enter the 6-digit code from your authenticator app.");
+      setMessageType("error");
+      return;
+    }
+
+    if (token.length !== 6) {
+      setMessage("Code must be exactly 6 digits.");
+      setMessageType("error");
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      await apiRequest('/auth/setup-2fa', {
+        method: 'POST',
+        body: {
+          username: user.username || user,
+          token: token.trim(),
+          secret
+        },
+      });
+
+      setMessage("2FA has been successfully activated for your account!");
+      setMessageType("success");
+      
+      setTimeout(() => {
+        
+        navigate("/", { 
+          state: { user: "Registration and 2FA setup complete! Please log in." }
+        });
+      }, 2000);
+
+    } catch (error) {
+      setMessage(error.message);
+      setMessageType("error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const skipSetup = () => {
-    navigate("/auth/login", { 
-      state: { message: "Registration complete! You can set up 2FA later in your account settings." }
-    });
+  const handleTokenChange = (e) => {
+    // Only allow numbers and limit to 6 digits
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setToken(value);
+    
+    // Clear message when user starts typing
+    if (message && messageType === "error") {
+      setMessage("");
+    }
   };
 
   if (!user) {
@@ -88,7 +130,7 @@ const Setup2FA = () => {
         </div>
         
         <div className="setup-2fa-card">
-          {isLoading ? (
+          {isInitialSetup && isLoading ? (
             <div className="setup-step">
               <div className="loading-container">
                 <p>Setting up 2FA for your account...</p>
@@ -96,39 +138,55 @@ const Setup2FA = () => {
               </div>
             </div>
           ) : (
-            <div className="qr-section">
-              <h3>Step 1: Scan QR Code</h3>
-              <p>Use your authenticator app (Google Authenticator, Authy, etc.) to scan this QR code:</p>
-              
-              {qrCode && (
-                <div className="qr-code-container">
-                  <img src={qrCode} alt="2FA QR Code" className="qr-code" />
+            <div className="setup-content">
+              <div className="qr-section">
+                <h3>Step 1: Scan QR Code</h3>
+                <p>Use your authenticator app (Google Authenticator, Authy, etc.) to scan this QR code:</p>
+                
+                {qrCode && (
+                  <div className="qr-code-container">
+                    <img src={qrCode} alt="2FA QR Code" className="qr-code" />
+                  </div>
+                )}
+                
+                <div className="manual-entry">
+                  <p><strong>Manual entry key:</strong></p>
+                  <code className="secret-key">{secret}</code>
                 </div>
-              )}
-              
-              <div className="manual-entry">
-                <p><strong>Manual entry key:</strong></p>
-                <code className="secret-key">{secret}</code>
               </div>
 
-              <div className="button-group">
-                <Button 
-                  onClick={proceedToVerification}
-                  disabled={!qrCode || !secret}
-                  className="proceed-button"
-                >
-                  Proceed to Verification
-                </Button>
-              </div>
-
-              <div className="skip-section">
-                <button 
-                  type="button"
-                  onClick={skipSetup}
-                  className="skip-button"
-                >
-                  Skip for now (set up later)
-                </button>
+              <div className="verify-section">
+                <h3>Step 2: Verify Setup</h3>
+                <p>Enter the 6-digit code from your authenticator app:</p>
+                
+                <form onSubmit={handleSubmit} className="verify-form">
+                  <div className="input-group">
+                    <Input
+                      type="text"
+                      name="token"
+                      id="token"
+                      value={token}
+                      onChange={handleTokenChange}
+                      placeholder="000000"
+                      disabled={isLoading}
+                      maxLength={6}
+                      className="token-input"
+                      autoComplete="one-time-code"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div className="button-group">
+                    <Button 
+                      type="submit" 
+                      disabled={isLoading || token.length !== 6}
+                      className="setup-button"
+                    >
+                      {isLoading ? "Activating..." : "Activate 2FA"}
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

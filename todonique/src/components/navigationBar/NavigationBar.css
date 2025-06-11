@@ -1,8 +1,14 @@
 .navbar {
   background-color: #9e16e2;
-  padding: 1rem;
+  height: 60px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+  padding: 0 1rem;
 }
 
 .navbar__brand {
@@ -10,12 +16,20 @@
   color: white;
   text-decoration: none;
   font-weight: bold;
+  line-height: 60px;
 }
 
 .navbar__mobile-header {
   display: none;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+}
+
+@media (max-width: 769px) {
+  .navbar__logout {
+    display: none;
+  }
 }
 
 .navbar__list {
@@ -30,20 +44,34 @@
 .navbar__link {
   color: white;
   text-decoration: none;
+  font-size: 1rem;
+  transition: opacity 0.2s ease;
+}
+
+.navbar__link:hover {
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 0 1rem;
+    align-items: flex-start;
+  }
+
   .navbar__mobile-header {
     display: flex;
+    height: 60px;
   }
 
   .navbar__list {
     display: none;
     flex-direction: column;
-    align-items: start;
-    padding: 0;
-    gap: 1rem;
-    margin-top: 1rem;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0.5rem 0;
+    gap: 0.75rem;
   }
 
   .navbar__list--visible {
@@ -57,7 +85,6 @@
   }
 
   .navbar__list {
-    display: flex;
     flex-direction: row;
     gap: 1.5rem;
   }

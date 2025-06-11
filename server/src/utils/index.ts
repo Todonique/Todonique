@@ -1,4 +1,4 @@
 import { extractBearerToken } from './authUtils';
-import { isBlockedLocation } from './authUtils';
+import { isAllowedLocation } from './authUtils';
 
-export { extractBearerToken, isBlockedLocation };
+export { extractBearerToken, isAllowedLocation };

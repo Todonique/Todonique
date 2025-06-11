@@ -27,7 +27,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     children: [
-      {path : "/", element: <Dashboard />},
+      { path: "/", element: <Dashboard /> },
       { path: "teams/:teamId/todos", element: <ReadTodos /> },
       { path: "teams/:teamId/todos/create", element: <CreateTodo /> },
       { path: "teams/:teamId/todos/:todoId", element: <UpdateTodo /> },

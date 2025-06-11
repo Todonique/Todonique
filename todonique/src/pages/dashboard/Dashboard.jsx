@@ -2,20 +2,23 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import { apiRequest } from '../../utils/api';
+import Loader from '../../components/Loader/Loader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTeams();
   }, []);
 
-  const handleTeamClick = (teamId) => {
-    navigate(`/teams/${teamId}/todos`);
+  const handleTeamClick = (teamId, teamName) => {
+    navigate(`/teams/${teamId}/todos?name=${encodeURIComponent(teamName)}`);
   };
 
   const fetchTeams = async () => {
+    setLoading(true);
     try {
       const result = await apiRequest(`/teams/teams`, {
         method: 'GET',
@@ -25,14 +28,16 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching teams:", error);
       // TODO Handle error
+    } finally {
+      setLoading(false);
     };
-    // Loading state
   };
-  
 
+  if (loading) return <Loader />;
+  
   return (
     <main className="dashboard">
-      <header>
+      <header className='dashboard__header'>
         <h1 className="dashboard__title">Teams</h1>
       </header>
 
@@ -43,10 +48,10 @@ const Dashboard = () => {
           <article
             key={team.teamId}
             className="team-card"
-            onClick={() => handleTeamClick(team.teamId)}
+            onClick={() => handleTeamClick(team.teamId, team.name)}
             role="button"
             tabIndex="0"
-            onKeyDown={(e) => e.key === 'Enter' && handleTeamClick(team.teamId)}
+            onKeyDown={(e) => e.key === 'Enter' && handleTeamClick(team.teamId, team.name)}
           >
             <header>
               <h2 className="team-card__name">{team.name}</h2>

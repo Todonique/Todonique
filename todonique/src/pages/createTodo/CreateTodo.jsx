@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./CreateTodo.css";
 import { apiRequest } from "../../utils/api";
 import { useParams } from "react-router-dom";
-
+import { ToastContainer, toast } from 'react-toastify';
 export default function CreateTodo() {
   const { teamId } = useParams();
   const [form, setForm] = useState({
@@ -18,13 +18,11 @@ export default function CreateTodo() {
   const [teamMembers, setTeamMembers] = useState([]);
 
   const fetchTeamMembers = async () => {
-    setLoading(true);
-    try {
-      const teamMembers = await apiRequest(`/teams/team/${teamId}/members`);
-      setTeamMembers(teamMembers);
-    } finally {
-      setLoading(false);
-    }
+    const result = await apiRequest(`/teams/team/${teamId}/members`, {
+      method: "GET",
+      auth: true,
+    });
+    setTeamMembers(result);
   };
 
   useEffect(() => {
@@ -45,19 +43,24 @@ export default function CreateTodo() {
       const requestBody = {
         title: form.title.trim(),
         description: form.description.trim(),
-        team: parseInt(form.team, 10),
-        assigned_to: form.assigned_to,
+        team_id: parseInt(form.team, 10),
+        assigned_to: parseInt(form.assigned_to, 10),
         status: form.status,
       };
 
       try {
         setSubmitLoading(true);
-        await apiRequest('todos/todo', {
+        await apiRequest('/todos/todo', {
           method: 'POST',
           body: requestBody,
-          auth: false,
+          auth: true,
         });
-        setMessage("Todo created successfully!");
+        toast.success('Successfuly created todo.', {
+          position: "bottom-right",
+          autoClose: 4000,
+          closeOnClick: true,
+          draggable: false
+        });
         setForm((prev) => ({
           ...prev,
           title: "",
@@ -65,17 +68,28 @@ export default function CreateTodo() {
           assigned_to: "",
           status: "Pending",
         }));
-      } catch {
-        setMessage("Error creating todo.");
+      } catch (error) {
+          toast.error(`Error updating todo. ${error}`, {
+            position: "bottom-right",
+            autoClose: 4000,
+            closeOnClick: true,
+            draggable: false
+          });
       } finally {
         setSubmitLoading(false);
       }
     } else {
-      setMessage("Please fill in all fields.");
+      toast.warn('Please fill in all fields.', {
+        position: "bottom-right",
+        autoClose: 4000,
+        closeOnClick: true,
+        draggable: false
+      });
     }
   };
 
   return (
+    <>
     <section className="create-todo">
       <header className="title-container">
         <h1 className="title">Create Todo</h1>
@@ -111,8 +125,8 @@ export default function CreateTodo() {
         >
           <option value="">Select a team member</option>
           {teamMembers.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
+            <option key={member.userId} value={member.userId}>
+              {member.userName}
             </option>
           ))}
         </select>
@@ -129,9 +143,9 @@ export default function CreateTodo() {
           onChange={handleChange}
           required
         >
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
         </select>
 
         <button type="submit" disabled={submitLoading}>
@@ -140,5 +154,7 @@ export default function CreateTodo() {
       </form>
       {message && <p>{message}</p>}
     </section>
+     <ToastContainer />
+    </>
   );
 }

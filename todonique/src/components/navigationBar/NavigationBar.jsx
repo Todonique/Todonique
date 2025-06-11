@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./NavigationBar.css";
 import { HamburgerIcon } from "../hamburgerIcon/HamburgerIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CtaButton from "../ctaButton.jsx/CtaButton";
 
 export const NavigationBar = () => {
-    const userRole = "team-lead"; // "admin", "team-lead", "user"
-
-  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+    const navigate = useNavigate();
+    const authToken = localStorage.getItem("authToken");
+    const [userRole, setUserRole] = useState(null);
+    const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
 
     const handleMobileNavToggle = () => {
         setMobileNavigationOpen((prev) => !prev);
@@ -14,6 +16,29 @@ export const NavigationBar = () => {
 
     const closeMobileNav = () => {
         setMobileNavigationOpen(false);
+    };
+
+    const getRoleFromToken = (token) => {
+        if (!token) return null;
+        try {
+            const base64Payload = token.split('.')[1];
+            const payload = JSON.parse(atob(base64Payload));
+            return payload.role;
+        } catch {
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        if (authToken) {
+            const role = getRoleFromToken(authToken);
+            setUserRole(role);
+        };
+    }, [authToken, userRole]);
+
+    const handleLogout = () => {
+        localStorage.removeItem("authToken");
+        navigate("/auth/login");
     };
 
     if (userRole === "admin") {
@@ -29,15 +54,25 @@ export const NavigationBar = () => {
         );
     }
 
-    if (userRole === "team-lead") {
+    if (userRole === "team_lead") {
         return (
             <nav className="navbar">
-                <ul className="navbar__list navbar__list--visible">
-                    <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
-                </ul>
-            </nav>
+            <section className="navbar__mobile-header">
+                <Link className="navbar__brand" to="/" onClick={closeMobileNav}>Todonique</Link>
+                <HamburgerIcon isOpen={mobileNavigationOpen} onClick={handleMobileNavToggle} />
+            </section>
+            <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
+                <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/invites/send" onClick={closeMobileNav}>Send Invite</Link></li>
+                <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
+                 {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" onClick={handleLogout}>Logout</Link></li>}
+            </ul>
+            {!mobileNavigationOpen && (
+                <section className="navbar__logout">
+                    <CtaButton text={"Logout"} onClick={handleLogout} />
+                </section>
+            )}
+        </nav>
         );
     }
 
@@ -51,8 +86,14 @@ export const NavigationBar = () => {
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
                 <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
                 <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
+                 {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" onClick={handleLogout}>Logout</Link></li>}
+
             </ul>
+            {!mobileNavigationOpen && (
+                <section className="navbar__logout">
+                    <CtaButton text={"Logout"} onClick={handleLogout} />
+                </section>
+            )}
         </nav>
     );
 };

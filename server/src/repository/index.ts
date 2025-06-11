@@ -1,4 +1,2 @@
-import { createTodo, updateTodo, getTodosByUserInTeam } from "./todoRepository";
-
-export { createTodo, updateTodo, getTodosByUserInTeam };
+export { createTodo, updateTodo, getTodosByUserInTeam, getTodoById, insertTodoUpdateInHistory, getTodoHistoryByTodoIds } from "./todoRepository";
 export { createTeam, updateTeam, deleteTeam, getTeamsForTodoUser, insertTeamMember, getTeamMembers } from "./teamRepository";

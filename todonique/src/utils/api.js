@@ -32,9 +32,7 @@ export async function apiRequest(endpoint, {
     };
 
     if (body && method !== "GET") {
-
       fetchOptions.body = JSON.stringify(body);
-      
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
@@ -44,7 +42,7 @@ export async function apiRequest(endpoint, {
     const data = isJson ? await response.json() : await response.text();
 
     if (!response.ok) {
-      throw new Error(data?.message || response.statusText);
+      throw new Error(data?.message || response.error ||response.statusText);
     }
 
     return data;

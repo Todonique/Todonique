@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import './ReadTodos.css';
 import CtaButton from "../../components/ctaButton.jsx/CtaButton";
 import { apiRequest } from "../../utils/api";
@@ -32,14 +32,18 @@ function TodoCard({ todo }) {
 }
 
 export default function ReadTodos() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const teamName = searchParams.get('name');
   const { teamId } = useParams();
   const [todos, setTodos] = useState([]);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterAssignedTo, setFilterAssignedTo] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const todosPerPage = 6;
+  const todosPerPage = 8;
 
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (teamId) {
@@ -79,7 +83,7 @@ export default function ReadTodos() {
   return (
     <main className="todo">
       <header className="todo__header">
-        <h1 className="todo__title">DevOps Todos</h1>
+        <h1 className="todo__title">{teamName || "Team"} Todos</h1>
         <CtaButton
           text={"Create Todo"}
           onClick={() => navigate('create', { relative: 'path' })}
