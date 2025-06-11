@@ -108,7 +108,7 @@ export const NavigationBar = () => {
                 </li>
                 <li className="navbar__item">
                     <Link 
-                        className={`navbar__link ${isActiveLink("/invites") ? "navbar__link--active" : ""}`} 
+                        className={`navbar__link ${isActiveLink("/invites/send") ? "navbar__link--active" : ""}`} 
                         to="/invites" 
                         onClick={closeMobileNav}
                     >
