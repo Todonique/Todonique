@@ -19,16 +19,31 @@ export default function AdminRoleManagement() {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
-  const handleRoleChange = async (userId, newRole) => {
+  const handleRoleChange = async (user) => {
+    const newRole = prompt(`Change role for ${user.username} (current: ${user.role}) to:`, user.role);
+    if (!newRole || newRole === user.role) return;
+
+    const allowedRoles = ['user', 'team_lead', 'admin'];
+    if (!allowedRoles.includes(newRole)) {
+      setMessage("Invalid role selected.");
+      return;
+    }
+
     try {
-      await apiRequest(`/admin/user/${userId}/role`, {
+      await apiRequest(`/admin/user/${user.user_id}/role`, {
         method: "PATCH",
-        body: { role: newRole },
+        body: {
+          role: newRole,
+          currentRole: user.role,
+          userId: user.user_id
+        },
       });
+      setUsers(prev =>
+        prev.map(u => u.user_id === user.user_id ? { ...u, role: newRole } : u)
+      );
       setMessage("Role updated successfully!");
     } catch {
       setMessage("Error updating role.");
@@ -41,23 +56,18 @@ export default function AdminRoleManagement() {
       {loading ? <p>Loading users...</p> : (
         <table>
           <thead>
-            <tr>
-              <th>Name</th><th>Email</th><th>Role</th>
-            </tr>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr>
           </thead>
           <tbody>
             {users.map(user => (
-              <tr key={user.id}>
-                <td>{user.name}</td><td>{user.email}</td>
+              <tr key={user.user_id}>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
                 <td>
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                  >
-                    <option value="member">Member</option>
-                    <option value="team_lead">Team Lead</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  <button onClick={() => handleRoleChange(user)}>
+                    Change Role
+                  </button>
                 </td>
               </tr>
             ))}

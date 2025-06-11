@@ -25,11 +25,12 @@ app.use('/api/roles', apiRateLimiter, roleRoutes);
 app.use('/api/history', apiRateLimiter, authenticate, todoReportingRoutes);
 app.use('/api/invites', apiRateLimiter, authenticate, inviteRoutes);
 app.use('/api/users', apiRateLimiter, authenticate, userRoutes);
+app.use('/api/admin', apiRateLimiter, authenticate, adminRoutes);
+
 
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');
 });
 
-app.use('/api/admin', authenticate, authorize('admin'), locationCheck(ipinfoWrapper), adminRoutes);
 
 export default app;

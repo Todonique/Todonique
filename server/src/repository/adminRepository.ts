@@ -7,27 +7,15 @@ export async function getAllUsers() {
   return result.rows;
 }
 
-export async function getAllTeams() {
+export async function updateUserRole(userId: number, currentRole: string, newRole: string): Promise<boolean> {
+  if (currentRole === newRole) return false;
+
+  if (currentRole === 'admin' && newRole === 'user') return false;
+
   const result = await pool.query(`
-    SELECT team_id, name, description, created_at FROM teams ORDER BY created_at DESC
-  `);
-  return result.rows;
-}
+    UPDATE users SET role = $1
+    WHERE user_id = $2 AND role = $3
+  `, [newRole, userId, currentRole]);
 
-export async function approveTeamLead(userId: number, teamId: number): Promise<boolean> {
-  const result = await pool.query(`
-    UPDATE team_members
-    SET role = 'team_lead'
-    WHERE user_id = $1 AND team_id = $2 AND role != 'team_lead'
-  `, [userId, teamId]);
-
-  return result.rowCount != null && result.rowCount > 0;
-}
-
-export async function updateUserRole(userId: number, role: 'user' | 'admin'): Promise<boolean> {
-  const result = await pool.query(
-    `UPDATE users SET role = $1 WHERE user_id = $2 AND role != $1`,
-    [role, userId]
-  );
-  return result.rowCount != null && result.rowCount > 0;
+  return !!result?.rowCount;
 }
