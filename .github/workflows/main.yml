@@ -98,7 +98,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # Navigate to app
-            cd /home/ubuntu/todonique-app
+            cd /home/ubuntu/todonique-app/server
 
             # Reset changes and pull latest
             git reset --hard HEAD
@@ -117,13 +117,11 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
 
-            # Build server
-            cd server
             npm install
             npm run build
 
             # Restart app with PM2
-            cd ..
+            cd ../..
             pm2 restart todonique-app || pm2 start server/dist/server.js --name "todonique-app"
 
             # Set domain variable
