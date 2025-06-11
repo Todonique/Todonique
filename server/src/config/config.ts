@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 import sanitize from 'sanitize-html';
-import crypto from 'crypto';
 
-dotenv.config();
+dotenv.config({
+  path: ".env"
+});
 
 export type Config = {
   port: number;
@@ -45,7 +46,7 @@ export const config: Config = {
   dbHost: parseIfSetElseDefault('DB_HOST', 'localhost'),
   dbName: parseIfSetElseDefault('DB_NAME', 'Todonique'),
   dbUser: parseIfSetElseDefault('DB_USER', 'postgres'),
-  dbPort: Number(parseIfSetElseDefault('DB_PORT', '5433')),
+  dbPort: Number(parseIfSetElseDefault('DB_PORT', '5432')),
   dbPassword: parseIfSetElseDefault('DB_PASSWORD', '12345'),
   allowedOrigins: parseIfSetElseDefault('ALLOWED_ORIGINS', ['http://localhost:3000','http://localhost:5173']),
   maxBytesRequestSize: parseIfSetElseDefault('MAX_REQUEST_SIZE', 10485760),

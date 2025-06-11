@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 
 export const loginRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: 50,
     message: 'Too many login attempts from this IP, please try again later'
 });
 
@@ -23,9 +23,9 @@ export const apiRateLimiter = rateLimit({
 export const securityHeaders = helmet();
 
 export const corsMiddleware = cors({
-    origin: config.allowedOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+  origin: process.env.ALLOWED_ORIGINS && JSON.parse(process.env.ALLOWED_ORIGINS),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 });
 
 export const csPMiddleware = (req: Request, res: Response, next: NextFunction) => {

@@ -73,3 +73,13 @@
     font-size: 1.5rem;
     color: #333;
 }
+
+.reporting-container {
+  margin-bottom: 2rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  max-width: 400px;
+  align-items: center;
+  padding: 2rem;
+}
