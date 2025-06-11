@@ -41,28 +41,23 @@ const Reporting = () => {
   const [historyData, setHistoryData] = useState([]);
 
   useEffect(() => {
-    const fetchTodoHistory = async () => {
-      const data = mockTodoHistory;
-      setHistoryData(data);
-    };
-
     fetchTodoHistory();
   }, []);
 
-  // const fetchTodoHistory = async () => {
-  //   try {
-  //     // TODO need to align with backend
-  //     const result = await apiRequest(`/todos/todo/${todoId}/history`, {
-  //         method: 'GET',
-  //         auth: true,
-  //     });
-  //     setHistoryData(result)
-  //   } catch (error) {
-  //     console.error("Error fetching todo history:", error);
-  //   };
-  //   // TODO loading state
-  //   // TODO handle error
-  // };
+  const fetchTodoHistory = async () => {
+    try {
+      const result = await apiRequest(`/history/todo/history`, {
+          method: 'POST',
+          auth: true,
+          body: {
+            todoIds: todoId ? [todoId] : []
+          }
+      });
+      setHistoryData(result)
+    } catch (error) {
+      console.error("Error fetching todo history:", error);
+    };
+  };
 
   return (
     <section className="reporting">
@@ -75,7 +70,6 @@ const Reporting = () => {
             <tr>
               <th>Timestamp</th>
               <th>Changed By</th>
-              <th>Change Type</th>
               <th>Title</th>
               <th>Description</th>
               <th>Assigned To</th>
@@ -87,7 +81,6 @@ const Reporting = () => {
               <tr key={entry.todo_history_id}>
                 <td>{new Date(entry.updated_at).toLocaleString()}</td>
                 <td>{entry.updated_by}</td>
-                <td>{entry.change_type}</td>
                 <td>
                   {entry.old_title || "-"} → {entry.new_title || "-"}
                 </td>
