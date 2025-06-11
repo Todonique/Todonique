@@ -98,7 +98,7 @@ jobs:
       steps:
         - name: "Checkout Code"
           uses: actions/checkout@v4
- 
+
         - name: "Deploy to EC2 via SSH"
           uses: appleboy/ssh-action@v1.0.3
           with:
@@ -106,8 +106,16 @@ jobs:
             username: ubuntu
             key: ${{ secrets.EC2_SSH_KEY }}
             script: |
-              cd /home/ubuntu/todonique-app/server
-              npm install ts-node
+              # Update packages and install nginx & certbot
+              sudo apt update
+              sudo apt install -y nginx python3-certbot-nginx
+
+              # Open HTTP/HTTPS ports via UFW
+              sudo ufw allow 'Nginx Full'
+
+              # Set up your app
+              cd /home/ubuntu/todonique-app
+
               cat > .env << EOF
               PGHOST=${{ secrets.DB_HOST }}
               PGUSER=${{ secrets.DB_USERNAME }}
@@ -117,7 +125,42 @@ jobs:
               PORT=${{ secrets.PORT }}
               NODE_ENV=development
               EOF
+
               git pull origin ${{ github.ref_name }}
+              cd server
               npm install
               npm run build
+
+              # Start or restart the app
               pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
+
+              # Configure Nginx to proxy requests to Node.js
+              sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+              server {
+                  listen 80;
+                  server_name ${{ secrets.DOMAIN_NAME }} www.${{ secrets.DOMAIN_NAME }};
+
+                  location / {
+                      proxy_pass http://localhost:${{ secrets.PORT }};
+                      proxy_http_version 1.1;
+                      proxy_set_header Upgrade \$http_upgrade;
+                      proxy_set_header Connection 'upgrade';
+                      proxy_set_header Host \$host;
+                      proxy_cache_bypass \$http_upgrade;
+                  }
+              }
+              EOF
+
+              sudo nginx -t
+              sudo systemctl restart nginx
+
+              # Get SSL certificate with Let's Encrypt
+              sudo certbot --nginx \
+                --non-interactive \
+                --agree-tos \
+                -m ${{ secrets.ADMIN_EMAIL }} \
+                -d ${{ secrets.DOMAIN_NAME }} \
+                -d www.${{ secrets.DOMAIN_NAME }}
+
+              # Auto-renew setup
+              echo "0 3 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab
