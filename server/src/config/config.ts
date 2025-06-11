@@ -1,8 +1,9 @@
 import dotenv from 'dotenv';
 import sanitize from 'sanitize-html';
-import crypto from 'crypto';
 
-dotenv.config();
+dotenv.config({
+  path: ".env"
+});
 
 export type Config = {
   port: number;

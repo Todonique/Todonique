@@ -109,13 +109,19 @@ jobs:
             PGDATABASE=${{ secrets.DB_NAME }}
             PGPASSWORD=${{ secrets.DB_PASSWORD }}
             PGPORT=${{ secrets.DB_PORT }}
+            cd server
+            npm install
+            npm run build
+            cat > dist/.env << EOF
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_USER=${{ secrets.DB_USERNAME }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
             PORT=${{ secrets.PORT }}
             NODE_ENV=production
             EOF
             git pull origin ${{ github.ref_name }}
-            cd server
-            npm install
-            npm run build
             pm2 restart todonique-app || pm2 start dist/server.js --name "todonique-app"
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
             server {
