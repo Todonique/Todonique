@@ -23,7 +23,7 @@ export const apiRateLimiter = rateLimit({
 export const securityHeaders = helmet();
 
 export const corsMiddleware = cors({
-    origin: config.allowedOrigins,
+    origin: process.env.ALLOWED_ORIGINS,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 });
