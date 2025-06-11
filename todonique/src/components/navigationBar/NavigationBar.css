@@ -45,11 +45,34 @@
   color: white;
   text-decoration: none;
   font-size: 1rem;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  position: relative;
 }
 
 .navbar__link:hover {
   opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Active link styles */
+.navbar__link--active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Alternative: Underline style for active links */
+.navbar__link--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background-color: white;
+  border-radius: 1px;
 }
 
 @media (max-width: 768px) {
@@ -76,6 +99,16 @@
 
   .navbar__list--visible {
     display: flex;
+  }
+
+  .navbar__link--active::after {
+    display: none;
+  }
+
+  .navbar__link--active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left: 3px solid white;
+    padding-left: 0.75rem;
   }
 }
 

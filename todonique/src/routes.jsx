@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import Root from "./layouts/Root";
 import AuthLayout from "./layouts/AuthLayout";
@@ -24,7 +25,11 @@ import CreateTeamForm from "./components/CreateTeamForm/CreateTeamForm";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    element: (
+      <ProtectedRoute>
+        <Root />
+      </ProtectedRoute>
+    ),
     children: [
       { path: "/", element: <Dashboard /> },
       { path: "teams/:teamId/todos", element: <ReadTodos /> },
@@ -62,3 +67,4 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+

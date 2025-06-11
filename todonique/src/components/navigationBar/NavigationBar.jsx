@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./NavigationBar.css";
 import { HamburgerIcon } from "../hamburgerIcon/HamburgerIcon";
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import CtaButton from "../ctaButton.jsx/CtaButton";
 
 export const NavigationBar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const authToken = localStorage.getItem("authToken");
     const [userRole, setUserRole] = useState(null);
     const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
@@ -29,6 +30,11 @@ export const NavigationBar = () => {
         }
     };
 
+    // Helper function to determine if a link is active
+    const isActiveLink = (path) => {
+        return location.pathname === path;
+    };
+
     useEffect(() => {
         if (authToken) {
             const role = getRoleFromToken(authToken);
@@ -45,9 +51,33 @@ export const NavigationBar = () => {
         return (
             <nav className="navbar">
                 <ul className="navbar__list navbar__list--visible">
-                    <li className="navbar__item"><Link className="navbar__link" to="/admin/reset-password" onClick={closeMobileNav}>Reset Password</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/admin/approve-team-lead" onClick={closeMobileNav}>Approve Team Lead</Link></li>
-                    <li className="navbar__item"><Link className="navbar__link" to="/setup-mfa" onClick={closeMobileNav}>Setup MFA</Link></li>
+                    <li className="navbar__item">
+                        <Link 
+                            className={`navbar__link ${isActiveLink("/admin/reset-password") ? "navbar__link--active" : ""}`} 
+                            to="/admin/reset-password" 
+                            onClick={closeMobileNav}
+                        >
+                            Reset Password
+                        </Link>
+                    </li>
+                    <li className="navbar__item">
+                        <Link 
+                            className={`navbar__link ${isActiveLink("/admin/approve-team-lead") ? "navbar__link--active" : ""}`} 
+                            to="/admin/approve-team-lead" 
+                            onClick={closeMobileNav}
+                        >
+                            Approve Team Lead
+                        </Link>
+                    </li>
+                    <li className="navbar__item">
+                        <Link 
+                            className={`navbar__link ${isActiveLink("/setup-mfa") ? "navbar__link--active" : ""}`} 
+                            to="/setup-mfa" 
+                            onClick={closeMobileNav}
+                        >
+                            Setup MFA
+                        </Link>
+                    </li>
                 </ul>
             </nav>
         );
@@ -61,9 +91,33 @@ export const NavigationBar = () => {
                 <HamburgerIcon isOpen={mobileNavigationOpen} onClick={handleMobileNavToggle} />
             </section>
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
-                <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/teams/create" onClick={closeMobileNav}>Create Team</Link></li>
+                <li className="navbar__item">
+                    <Link 
+                        className={`navbar__link ${isActiveLink("/") ? "navbar__link--active" : ""}`} 
+                        to="/" 
+                        onClick={closeMobileNav}
+                    >
+                        Dashboard
+                    </Link>
+                </li>
+                <li className="navbar__item">
+                    <Link 
+                        className={`navbar__link ${isActiveLink("/invites") ? "navbar__link--active" : ""}`} 
+                        to="/invites" 
+                        onClick={closeMobileNav}
+                    >
+                        Invites
+                    </Link>
+                </li>
+                <li className="navbar__item">
+                    <Link 
+                        className={`navbar__link ${isActiveLink("/teams/create") ? "navbar__link--active" : ""}`} 
+                        to="/teams/create" 
+                        onClick={closeMobileNav}
+                    >
+                        Create Team
+                    </Link>
+                </li>
                  {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" onClick={handleLogout}>Logout</Link></li>}
             </ul>
             {!mobileNavigationOpen && (
@@ -83,8 +137,24 @@ export const NavigationBar = () => {
                 
             </section>
             <ul className={`navbar__list ${mobileNavigationOpen ? "navbar__list--visible" : ""}`}>
-                <li className="navbar__item"><Link className="navbar__link" to="/" onClick={closeMobileNav}>Dashboard</Link></li>
-                <li className="navbar__item"><Link className="navbar__link" to="/invites" onClick={closeMobileNav}>Invites</Link></li>
+                <li className="navbar__item">
+                    <Link 
+                        className={`navbar__link ${isActiveLink("/") ? "navbar__link--active" : ""}`} 
+                        to="/" 
+                        onClick={closeMobileNav}
+                    >
+                        Dashboard
+                    </Link>
+                </li>
+                <li className="navbar__item">
+                    <Link 
+                        className={`navbar__link ${isActiveLink("/invites") ? "navbar__link--active" : ""}`} 
+                        to="/invites" 
+                        onClick={closeMobileNav}
+                    >
+                        Invites
+                    </Link>
+                </li>
                  {mobileNavigationOpen && <li className="navbar__item"><Link className="navbar__link" onClick={handleLogout}>Logout</Link></li>}
 
             </ul>
