@@ -25,6 +25,20 @@ const Reporting = () => {
       console.error("Error fetching todo history:", error);
     };
   };
+  const fetchTodoHistory = async () => {
+    try {
+      const result = await apiRequest(`/history/todo/history`, {
+          method: 'POST',
+          auth: true,
+          body: {
+            todoIds: todoId ? [todoId] : []
+          }
+      });
+      setHistoryData(result)
+    } catch (error) {
+      console.error("Error fetching todo history:", error);
+    };
+  };
 
   return (
     <section className="reporting">
@@ -47,7 +61,7 @@ const Reporting = () => {
             {historyData.map((entry) => (
               <tr key={entry.todo_history_id}>
                 <td>{new Date(entry.updated_at).toLocaleString()}</td>
-                <td>{entry.updated_by_name}</td>
+                <td>{entry.updated_by}</td>
                 <td>
                   {entry.old_title || "-"} → {entry.new_title || "-"}
                 </td>
