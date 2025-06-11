@@ -10,6 +10,12 @@ export const NavigationBar = () => {
     const [userRole, setUserRole] = useState(null);
     const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
 
+    useEffect(() => {
+        if (!authToken) {
+            navigate("/auth/login");
+        }
+    }, [authToken]);
+
     const handleMobileNavToggle = () => {
         setMobileNavigationOpen((prev) => !prev);
     };
