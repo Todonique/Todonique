@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -85,6 +86,10 @@ jobs:
             migrate
 
   deploy:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      deploy:
     runs-on: ubuntu-latest
  
     steps:
