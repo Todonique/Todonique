@@ -3,39 +3,6 @@ import { apiRequest } from "../../utils/api";
 import "./Reporting.css";
 import { useEffect, useState } from "react";
 
-const mockTodoHistory = [
-  {
-    todo_history_id: 1,
-    todo_id: 101,
-    updated_by: 3,
-    updated_at: "2025-06-08T12:30:00Z",
-    old_title: "Initial Title",
-    new_title: "Updated Title",
-    old_description: "Old description",
-    new_description: "New description",
-    old_assigned_to_value: 2,
-    new_assigned_to_value: 4,
-    old_status_value: 1,
-    new_status_value: 2,
-    change_type: "update",
-  },
-  {
-    todo_history_id: 2,
-    todo_id: 102,
-    updated_by: 4,
-    updated_at: "2025-06-07T09:15:00Z",
-    old_title: null,
-    new_title: null,
-    old_description: null,
-    new_description: null,
-    old_assigned_to_value: 1,
-    new_assigned_to_value: 5,
-    old_status_value: null,
-    new_status_value: null,
-    change_type: "assign",
-  },
-];
-
 const Reporting = () => {
   const { todoId } = useParams();
   const [historyData, setHistoryData] = useState([]);
@@ -80,7 +47,7 @@ const Reporting = () => {
             {historyData.map((entry) => (
               <tr key={entry.todo_history_id}>
                 <td>{new Date(entry.updated_at).toLocaleString()}</td>
-                <td>{entry.updated_by}</td>
+                <td>{entry.updated_by_name}</td>
                 <td>
                   {entry.old_title || "-"} → {entry.new_title || "-"}
                 </td>
@@ -88,10 +55,10 @@ const Reporting = () => {
                   {entry.old_description || "-"} → {entry.new_description || "-"}
                 </td>
                 <td>
-                  {entry.old_assigned_to_value ?? "-"} → {entry.new_assigned_to_value ?? "-"}
+                  {entry.old_assigned_name ?? "-"} → {entry.new_assigned_name ?? "-"}
                 </td>
                 <td>
-                  {entry.old_status_value ?? "-"} → {entry.new_status_value ?? "-"}
+                  {entry.old_status ?? "-"} → {entry.new_status ?? "-"}
                 </td>
               </tr>
             ))}

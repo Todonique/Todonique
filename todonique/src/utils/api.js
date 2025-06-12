@@ -1,4 +1,4 @@
-const BASE_URL = "https://todonique.xyz/api";
+const BASE_URL = "http://localhost:45000/api";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
