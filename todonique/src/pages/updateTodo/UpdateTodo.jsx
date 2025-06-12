@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./UpdateTodo.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CtaButton from "../../components/ctaButton.jsx/CtaButton";
 import { apiRequest } from "../../utils/api";
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,6 +12,27 @@ export default function UpdateTodo() {
   const [message, setMessage] = useState("");
 
   const [edit, setEdit] = useState(false);
+
+  const authToken = localStorage.getItem("authToken");
+  const [userRole, setUserRole] = useState(null);
+
+  const getRoleFromToken = (token) => {
+      if (!token) return null;
+      try {
+          const base64Payload = token.split('.')[1];
+          const payload = JSON.parse(atob(base64Payload));
+          return payload.role;
+      } catch {
+          return null;
+      }
+  };
+
+  useEffect(() => {
+      if (authToken) {
+          const role = getRoleFromToken(authToken);
+          setUserRole(role);
+      };
+  }, [authToken, userRole]);
 
   const fetchTeamMemebers = async () => {
     const result = await apiRequest(`/teams/team/${teamId}/members`, {
@@ -79,6 +100,12 @@ export default function UpdateTodo() {
     };
   };
 
+  const navigate = useNavigate();
+
+  const handleViewReporting = () => {
+    navigate(`/teams/${teamId}/todos/${todoId}/reporting`);
+  };
+
   if (!form) return <p>Loading...</p>;
 
   return (
@@ -88,6 +115,7 @@ export default function UpdateTodo() {
         <h1 className="title">{edit ? "Update Todo" : "View Todo"}</h1>
         <CtaButton text={edit ? "Cancel" : "Update Todo"} onClick={() => setEdit(!edit)} />
       </header>
+      
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>
         <input
@@ -147,6 +175,13 @@ export default function UpdateTodo() {
         )}
       </form>
       {message && edit && <p>{message}</p>}
+
+      <section className="reporting-container">
+        {userRole === "team_lead" && (
+          <CtaButton text={"View Reporting"} onClick={handleViewReporting} />
+        )}
+      </section>
+      
       
     </section>
     

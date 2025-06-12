@@ -15,13 +15,15 @@ app.use(corsMiddleware);
 app.use(requestSizeLimiter);
 app.use(sanitizeInput);
 
-app.use('/api/auth', loginRateLimiter, locationCheck(ipinfoWrapper), authRoutes);
-app.use('/api/todos', apiRateLimiter, authenticate, locationCheck(ipinfoWrapper), todoRoutes);
-app.use('/api/teams', apiRateLimiter, authenticate, locationCheck(ipinfoWrapper), teamRoutes);
-app.use('/api/roles', apiRateLimiter, locationCheck(ipinfoWrapper), roleRoutes);
-app.use('/api/history', apiRateLimiter, authenticate, locationCheck(ipinfoWrapper), todoReportingRoutes);
-app.use('/api/invites', apiRateLimiter, authenticate, locationCheck(ipinfoWrapper), inviteRoutes);
-app.use('/api/users', apiRateLimiter, authenticate, locationCheck(ipinfoWrapper), userRoutes);
+// locationCheck(ipinfoWrapper)
+
+app.use('/api/auth', loginRateLimiter, authRoutes);
+app.use('/api/todos', apiRateLimiter, authenticate, todoRoutes);
+app.use('/api/teams', apiRateLimiter, authenticate, teamRoutes);
+app.use('/api/roles', apiRateLimiter, roleRoutes);
+app.use('/api/history', apiRateLimiter, authenticate, todoReportingRoutes);
+app.use('/api/invites', apiRateLimiter, authenticate, inviteRoutes);
+app.use('/api/users', apiRateLimiter, authenticate, userRoutes);
 
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');
