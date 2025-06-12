@@ -17,6 +17,7 @@ export const createTodoHandler = async (req: Request, res: Response) => {
             if (!newTodo) {
                 res.status(404).json({ error: 'Todo not created' });
             } else{
+                await insertTodoUpdateInHistory(newTodo, newTodo, res.locals.user?.userId, res.locals.user?.username);
                 res.status(201).json(newTodo);
             }
         }
