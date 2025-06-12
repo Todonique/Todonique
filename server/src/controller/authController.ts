@@ -17,18 +17,32 @@ export const registerHandler = async (req: Request, res: Response) => {
     try {
     
         const { username, password, roleId }: CreateUser =  req.body;
+
         if (!username || !password) {
-             res.status(400).json({ error: 'username and password are required' });
-        }
+            res.status(400).json({ error: 'username and password are required' });
+            return;
+        };
+
+        if (!roleId) {
+            res.status(400).json({ error: 'Role ID required' });
+            return;
+        };
+
+        if (roleId !== 2 && roleId !== 3) {
+            res.status(400).json({ error: 'Invalid role ID' });
+            return;
+        };
         
         const existingUser = await UserModel.findByUsername(username);
         if (existingUser) {
-             res.status(400).json({ error: 'User already exists' });
+            res.status(400).json({ error: 'User already exists' });
+            return;
         }
         
         const newUser = await UserModel.createUser({ username, password , roleId });
         if (!newUser) {
             res.status(500).json({ error: 'Failed to create user' });
+            return;
         } else {
             const user = await UserModel.findByUsername(newUser.username);
             const jwtToken = jwt.sign(
@@ -48,11 +62,13 @@ export const registerHandler = async (req: Request, res: Response) => {
                 { expiresIn: '4h' }
             );
             res.json({ message: 'User registered successfully', data: user , jwtToken, refreshToken });
+            return;
         }
 
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ error: 'Internal server error' });
+        return;
     }
 };
 export const setupTwoFactorHandler = async (req: Request, res: Response) => {
