@@ -61,7 +61,7 @@ const Reporting = () => {
             {historyData.map((entry) => (
               <tr key={entry.todo_history_id}>
                 <td>{new Date(entry.updated_at).toLocaleString()}</td>
-                <td>{entry.updated_by}</td>
+                <td>{entry.updated_by_name}</td>
                 <td>
                   {entry.old_title || "-"} → {entry.new_title || "-"}
                 </td>
